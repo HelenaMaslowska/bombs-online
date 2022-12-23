@@ -8,10 +8,99 @@
 #include <error.h>
 #include <netdb.h>
 #include <sys/epoll.h>
-#include <poll.h> 
+#include <poll.h>
 #include <thread>
 #include <unordered_set>
 #include <signal.h>
+#include<iostream>
+#include<vector>
+#include<fstream>
+
+struct Player{
+	int x,y;
+	//u - up, d - down, ... , b - bomb
+	char nextMove='';
+	char looking='d';
+	int hp=3;
+	int bombStr=3;
+	int maxBombs=1;
+	int curBombs=0;
+	float speed=1;
+};
+
+struct Bomb{
+        int x,y;
+        int timer=60;
+        int range;
+};
+
+void drawGame(int** tab, int n)
+{
+
+}
+
+struct Game{
+    int n=15;
+	vector<Player> gracze;
+	int ileGraczy=0;
+	int plansza[n][n];
+
+	void init()
+	{
+		//TODO zaladuj plansze
+	}
+
+
+	void playerInput(int index, char input)
+	{
+	    gracze[index].nextMove=input;
+	}
+
+	void dodajGracza()
+	{
+		if(ileGraczy>=4)
+		{
+			return;
+		}
+		Player pom;
+		switch(ileGraczy)
+        {
+        case 0:
+            gracze[i].x=1;
+            gracze[i].y=1;
+            break;
+        case 1:
+            gracze[i].x=n-1;
+            gracze[i].y=1;
+            break;
+        case 2:
+            gracze[i].x=1;
+            gracze[i].y=n-1;
+            break;
+        case 3:
+            gracze[i].x=n-1;
+            gracze[i].y=n-1;
+            break;
+        }
+		gracze.push_back(pom);
+		ileGraczy++;
+	}
+
+    //30 ticks per second
+	void tick()
+	{
+		//TODO player actions
+
+		//TODO bomb ticks
+
+		drawGame(screen,n);
+		//Clear inputs
+		for(int i=0;i<ileGraczy;i++)
+        {
+            gracze[i].nextMove='';
+        }
+	}
+};
 
 // server socket
 int servFd;
@@ -35,50 +124,50 @@ int main(int argc, char ** argv){
 	// get and validate port number
 	if(argc != 2) error(1, 0, "Need 1 arg (port)");
 	auto port = readPort(argv[1]);
-	
+
 	// create socket
 	servFd = socket(AF_INET, SOCK_STREAM, 0);
 	if(servFd == -1) error(1, errno, "socket failed");
-	
+
 	// graceful ctrl+c exit
 	signal(SIGINT, ctrl_c);
 	// prevent dead sockets from throwing pipe errors on write
 	signal(SIGPIPE, SIG_IGN);
-	
+
 	setReuseAddr(servFd);
-	
+
 	// bind to any address and port provided in arguments
 	sockaddr_in serverAddr{.sin_family=AF_INET, .sin_port=htons((short)port), .sin_addr={INADDR_ANY}};
 	int res = bind(servFd, (sockaddr*) &serverAddr, sizeof(serverAddr));
 	if(res) error(1, errno, "bind failed");
-	
+
 	// enter listening mode
 	res = listen(servFd, 1);
 	if(res) error(1, errno, "listen failed");
-	
+
 /****************************/
-	
+
 	while(true){
 		// prepare placeholders for client address
 		sockaddr_in clientAddr{0};
 		socklen_t clientAddrSize = sizeof(clientAddr);
-		
+
 		// accept new connection
 		auto clientFd = accept(servFd, (sockaddr*) &clientAddr, &clientAddrSize);
 		if(clientFd == -1) error(1, errno, "accept failed");
-		
+
 		// add client to all clients set
 		clientFds.insert(clientFd);
-		
+
 		// tell who has connected
 		printf("new connection from: %s:%hu (fd: %d)\n", inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port), clientFd);
-		
+
 /****************************/
-		
+
 		// read a message
 		char buffer[255];
 		int count = read(clientFd, buffer, 255);
-		
+
 		if(count < 1) {
 			printf("removing %d\n", clientFd);
 			clientFds.erase(clientFd);
@@ -88,9 +177,9 @@ int main(int argc, char ** argv){
 			// broadcast the message
 			sendToAllBut(clientFd, buffer, count);
 		}
-		
+
 	}
-	
+
 /****************************/
 }
 

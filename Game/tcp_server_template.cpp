@@ -19,7 +19,7 @@
 struct Player{
 	int x,y;
 	//u - up, d - down, ... , b - bomb
-	char nextMove='';
+	char nextMove=' ';
 	char looking='d';
 	int hp=3;
 	int bombStr=3;
@@ -41,12 +41,17 @@ void drawGame(int** tab, int n)
 
 struct Game{
     int n=15;
-	vector<Player> gracze;
+	std::vector<Player> gracze;
 	int ileGraczy=0;
-	int plansza[n][n];
+	int **plansza;
 
 	void init()
 	{
+		plansza = new int*[n];
+		for(int i=0;i<n;i++)
+		{
+			plansza[i]=new int[n];
+		}
 		//TODO zaladuj plansze
 	}
 
@@ -64,23 +69,23 @@ struct Game{
 		}
 		Player pom;
 		switch(ileGraczy)
-        {
-        case 0:
-            gracze[i].x=1;
-            gracze[i].y=1;
-            break;
-        case 1:
-            gracze[i].x=n-1;
-            gracze[i].y=1;
-            break;
-        case 2:
-            gracze[i].x=1;
-            gracze[i].y=n-1;
-            break;
-        case 3:
-            gracze[i].x=n-1;
-            gracze[i].y=n-1;
-            break;
+        	{
+        	case 0:
+            		gracze[ileGraczy].x=1;
+            		gracze[ileGraczy].y=1;
+            		break;
+        	case 1:
+            		gracze[ileGraczy].x=n-1;
+            		gracze[ileGraczy].y=1;
+            		break;
+        	case 2:
+            		gracze[ileGraczy].x=1;
+            		gracze[ileGraczy].y=n-1;
+            		break;
+        	case 3:
+            		gracze[ileGraczy].x=n-1;
+            		gracze[ileGraczy].y=n-1;
+            		break;
         }
 		gracze.push_back(pom);
 		ileGraczy++;
@@ -93,11 +98,11 @@ struct Game{
 
 		//TODO bomb ticks
 
-		drawGame(screen,n);
+		//drawGame(screen,n);
 		//Clear inputs
 		for(int i=0;i<ileGraczy;i++)
         {
-            gracze[i].nextMove='';
+            gracze[i].nextMove=' ';
         }
 	}
 };

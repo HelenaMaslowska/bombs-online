@@ -8,6 +8,7 @@
 #include <sys/epoll.h>
 #include <poll.h> 
 #include <thread>
+#include <iostream>
 
 ssize_t readData(int fd, char * buffer, ssize_t buffsize){
 	auto ret = read(fd, buffer, buffsize);
@@ -59,6 +60,6 @@ int main(int argc, char ** argv){
 /****************************/
 	
 	close(sock);
-	
+	std::cout<<"a";
 	return 0;
 }

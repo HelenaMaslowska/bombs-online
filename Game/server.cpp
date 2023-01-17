@@ -16,6 +16,13 @@
 #include <fstream>
 using namespace std;
 //Server side
+/*
+
+g++ server.cpp -o server
+./server 8080
+
+*/
+
 int main(int argc, char *argv[])
 {
     //for the server, we only need to specify a port number

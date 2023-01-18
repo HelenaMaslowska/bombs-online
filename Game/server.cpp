@@ -24,7 +24,7 @@ g++ server.cpp -o server
 
 */
 struct Player{
-	int x,y;
+	float x,y;
 	//u - up, d - down, ... , b - bomb
 	char nextMove=' ';
 	char looking='d';
@@ -32,7 +32,7 @@ struct Player{
 	int bombStr=3;
 	int maxBombs=1;
 	int curBombs=0;
-	float speed=1;
+	float speed=0.05;
 };
 
 struct Bomb{
@@ -99,17 +99,86 @@ struct Game{
 	}
 
     //30 ticks per second
-	void tick()
+	int tick()
 	{
 		//TODO player actions
-
-		//TODO bomb ticks
-
-		//Clear inputs
 		for(int i=0;i<ileGraczy;i++)
-        {
-            gracze[i].nextMove=' ';
-        }
+		{
+			int y=int(gracze[i].y);
+			float modY = gracze[i].y - y;
+			if(modY>0.5f)
+			{
+				modY-=1;
+				y+=1;
+			}
+			int x=int(gracze[i].x);
+			float modX = gracze[i].x - x;
+			if(modX>0.5f)
+			{
+				modX-=1;
+				x+=1;
+			}
+			switch(gracze[i].nextMove)
+			{
+				case 'u':
+					gracze[i].looking='u';
+					if(modX>=-10 && modX <=10 && plansza[x][y-1] ==0)
+					{
+						gracze[i].y-=gracze[i].speed;
+					}else
+					{
+						if(modY>-10)
+						{
+							gracze[i].y-=min(modY+10, gracze[i].speed);
+						}
+					}
+					break;
+				case 'd':
+					gracze[i].looking='d';
+					if(modX>=-10 && modX <=10 && plansza[x][y+1] ==0)
+					{
+						gracze[i].y+=gracze[i].speed;
+					}else
+					{
+						if(modY<10)
+						{
+							gracze[i].y+=min(10-modY, gracze[i].speed);
+						}
+					}
+					break;
+				case 'l':
+					gracze[i].looking='l';
+					if(modY>=-10 && modY <=10 && plansza[x-1][y] ==0)
+					{
+						gracze[i].x-=gracze[i].speed;
+					}else
+					{
+						if(modX>-10)
+						{
+							gracze[i].x-=min(modX+10, gracze[i].speed);
+						}
+					}
+					break;
+				case 'r':
+					gracze[i].looking='r';
+					if(modY>=-10 && modY <=10 && plansza[x+1][y] ==0)
+					{
+						gracze[i].x+=gracze[i].speed;
+					}else
+					{
+						if(modX<10)
+						{
+							gracze[i].x+=min(10-modX, gracze[i].speed);
+						}
+					}
+					break;
+				case 'b':
+					break;
+			}
+			gracze[i].nextMove=' ';
+		}
+		//TODO bomb ticks
+        	return 0;
 	}
 };
 

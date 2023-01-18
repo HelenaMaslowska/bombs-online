@@ -14,6 +14,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <fstream>
+#include <vector>
 using namespace std;
 //Server side
 /*
@@ -22,6 +23,95 @@ g++ server.cpp -o server
 ./server 8080
 
 */
+struct Player{
+	int x,y;
+	//u - up, d - down, ... , b - bomb
+	char nextMove=' ';
+	char looking='d';
+	int hp=3;
+	int bombStr=3;
+	int maxBombs=1;
+	int curBombs=0;
+	float speed=1;
+};
+
+struct Bomb{
+        int x,y;
+        int timer=60;
+        int range;
+};
+
+void drawGame(int** tab, int n)
+{
+
+}
+
+struct Game{
+    int n=15;
+	vector<Player> gracze;
+	int ileGraczy=0;
+	int **plansza;
+
+	void init()
+	{
+		plansza=new int*[n];
+		for(int i=0;i<n;i++)
+		{
+			plansza[i]=new int[n];
+		}
+		//TODO zaladuj plansze
+	}
+
+
+	void playerInput(int index, char input)
+	{
+	    gracze[index].nextMove=input;
+	}
+
+	void dodajGracza()
+	{
+		if(ileGraczy>=4)
+		{
+			return;
+		}
+		Player pom;
+		switch(ileGraczy)
+        {
+        case 0:
+            gracze[ileGraczy].x=1;
+            gracze[ileGraczy].y=1;
+            break;
+        case 1:
+            gracze[ileGraczy].x=n-1;
+            gracze[ileGraczy].y=1;
+            break;
+        case 2:
+            gracze[ileGraczy].x=1;
+            gracze[ileGraczy].y=n-1;
+            break;
+        case 3:
+            gracze[ileGraczy].x=n-1;
+            gracze[ileGraczy].y=n-1;
+            break;
+        }
+		gracze.push_back(pom);
+		ileGraczy++;
+	}
+
+    //30 ticks per second
+	void tick()
+	{
+		//TODO player actions
+
+		//TODO bomb ticks
+
+		//Clear inputs
+		for(int i=0;i<ileGraczy;i++)
+        {
+            gracze[i].nextMove=' ';
+        }
+	}
+};
 
 int main(int argc, char *argv[])
 {

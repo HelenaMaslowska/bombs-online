@@ -259,7 +259,6 @@ struct Game{
 					if(plansza[x][y+j]==2)
 					{
 						plansza[x][y+j]=0;
-						break;
 					}
 					if(plansza[x][y+j]==1)
 					{
@@ -279,7 +278,6 @@ struct Game{
 					if(plansza[x][y-j]==2)
 					{
 						plansza[x][y-j]=0;
-						break;
 					}
 					if(plansza[x][y-j]==1)
 					{
@@ -299,7 +297,6 @@ struct Game{
 					if(plansza[x+j][y]==2)
 					{
 						plansza[x+j][y]=0;
-						break;
 					}
 					if(plansza[x+1][y]==1)
 					{
@@ -319,7 +316,6 @@ struct Game{
 					if(plansza[x-j][y]==2)
 					{
 						plansza[x-j][y]=0;
-						break;
 					}
 					if(plansza[x-1][y]==1)
 					{

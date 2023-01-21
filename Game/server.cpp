@@ -332,6 +332,61 @@ struct Game{
 		}
         	return 0;
 	}
+	
+	string drawGame()
+	{
+		int ile=0;
+		string send ="";
+		for(int i=0;i<n;i++)
+		{
+			for(int j=0;j<n;j++)
+			{
+				if(plansza[i][j]==2)
+				{
+					ile++;
+					send+=to_string(i)+";"+to_string(j)+";";
+				}
+			}
+		}
+		send = to_string(ile)+";"+send;
+		string undetonated = "";
+		string detonated = "";
+		int und=0;
+		int det=0;
+		for(int i=0;i<bomby.size();i++)
+		{
+			if(bomby[i].timer>0)
+			{
+				und+=1;
+				undetonated+=to_string(bomby[i].x)+";"+to_string(bomby[i].y)+";";
+			}else
+			{
+				det+=1;
+				detonated+=to_string(bomby[i].x)+";"+to_string(bomby[i].y)+";"+to_string(bomby[i].range)+";";
+			}
+		}
+		send+=to_string(und)+";"+undetonated+to_string(det)+";"+detonated;
+		send+=to_string(ileGraczy)+";";
+		for(int i=0;i<ileGraczy;i++)
+		{
+			int x=gracze[i].x*100;
+			int y=gracze[i].y*100;
+			send+=to_string(x)+";"+to_string(y)+";";
+			send+=gracze[i].looking+";";
+			send+=to_string(gracze[i].hp)+";";
+			send+=to_string(gracze[i].bombStr)+";";
+			send+=to_string(gracze[i].maxBombs)+";";
+			send+=to_string(gracze[i].curBombs)+";";
+			if(gracze[i].invulnerable>0)
+			{
+				send+="1;";
+			}else
+			{
+				send+="0;";
+			}
+		}
+		return send;
+	}
 };
 
 int main(int argc, char *argv[])

@@ -24,6 +24,9 @@ g++ server.cpp -o server
 ./server 8080
 
 */
+string map_files[8] = {"Maps/map1.txt","Maps/map2.txt","Maps/map3.txt","Maps/map4.txt","Maps/map5.txt","Maps/map6.txt","Maps/map7.txt","Maps/map8.txt"};
+
+
 struct Player{
 	float x,y;
 	//u - up, d - down, ... , b - bomb
@@ -57,14 +60,23 @@ struct Game{
 	int ileGraczy=0;
 	int **plansza;
 
-	void init()
+	void init(int k)
 	{
+		ifstream plik;
+		plik.open(map_files[k]);
+		string pom;
 		plansza=new int*[n];
 		for(int i=0;i<n;i++)
 		{
+			plik>>pom;
+			plik>>pom;
 			plansza[i]=new int[n];
+			for(int j=0;j<n;j++)
+			{
+				plansza[i][j]=pom[j];
+			}
 		}
-		//TODO zaladuj plansze
+		plik.close();
 	}
 
 
@@ -137,7 +149,7 @@ struct Game{
 			}
 			switch(gracze[i].nextMove)
 			{
-				case 'u':
+				case 'l':
 					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modY <= 0)){
 					gracze[i].looking='u';
 					if(modX>=-10 && modX <=10 && plansza[x][y-1] ==0)
@@ -152,7 +164,7 @@ struct Game{
 					}
 					}
 					break;
-				case 'd':
+				case 'r':
 					gracze[i].looking='d';
 					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modY >= 0)){
 					if(modX>=-10 && modX <=10 && plansza[x][y+1] ==0)
@@ -167,7 +179,7 @@ struct Game{
 					}
 					}
 					break;
-				case 'l':
+				case 'u':
 					gracze[i].looking='l';
 					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modX <= 0)){
 					if(modY>=-10 && modY <=10 && plansza[x-1][y] ==0)
@@ -182,7 +194,7 @@ struct Game{
 					}
 					}
 					break;
-				case 'r':
+				case 'd':
 					gracze[i].looking='r';
 					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modX >= 0)){
 					if(modY>=-10 && modY <=10 && plansza[x+1][y] ==0)

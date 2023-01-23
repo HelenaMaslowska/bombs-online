@@ -25,3 +25,29 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES += \
+    Graphics/Graphics/bomb.png \
+    Graphics/Graphics/boom.png \
+    Graphics/Graphics/player1.png \
+    Graphics/Graphics/player2.png \
+    Graphics/Graphics/player3.png \
+    Graphics/Graphics/player4.png \
+    Graphics/Graphics/powerup.png \
+    Graphics/Graphics/wall.png \
+    Graphics/bomb.png \
+    Graphics/boom.png \
+    Graphics/player1.png \
+    Graphics/player2.png \
+    Graphics/player3.png \
+    Graphics/player4.png \
+    Graphics/powerup.png \
+    Graphics/wall.png \
+    Maps/map1.txt \
+    Maps/map2.txt \
+    Maps/map3.txt \
+    Maps/map4.txt \
+    Maps/map5.txt \
+    Maps/map6.txt \
+    Maps/map7.txt \
+    Maps/map8.txt

@@ -403,17 +403,14 @@ struct Game{
 
 int main(int argc, char *argv[])
 {
-    //for the server, we only need to specify a port number
-    if(argc != 2)
-    {
+    char msg[1500];                                             // buffer to send and receive messages with
+    
+    if(argc != 2) {                                             // for the server, we only need to specify a port number
         cerr << "Usage: port" << endl;
         exit(0);
     }
-    //grab the port number
-    int port = atoi(argv[1]);
-    //buffer to send and receive messages with
-    char msg[1500];
-     
+    int port = atoi(argv[1]);                                   // grab the port number
+    
     //setup a socket and connection tools
     sockaddr_in servAddr;
     bzero((char*)&servAddr, sizeof(servAddr));
@@ -424,16 +421,13 @@ int main(int argc, char *argv[])
     //open stream oriented socket with internet address
     //also keep track of the socket descriptor
     int serverSd = socket(AF_INET, SOCK_STREAM, 0);
-    if(serverSd < 0)
-    {
+    if(serverSd < 0) {
         cerr << "Error establishing the server socket" << endl;
         exit(0);
     }
     //bind the socket to its local address
-    int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr, 
-        sizeof(servAddr));
-    if(bindStatus < 0)
-    {
+    int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr, sizeof(servAddr));
+    if(bindStatus < 0) {
         cerr << "Error binding socket to local address" << endl;
         exit(0);
     }
@@ -446,13 +440,13 @@ int main(int argc, char *argv[])
     socklen_t newSockAddrSize = sizeof(newSockAddr);
     //accept, create a new socket descriptor to 
     //handle the new connection with client
-    int newSd = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize);
-    if(newSd < 0)
-    {
+    int newSd = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize); //wiecej acceptów żeby przyjac klientów, powinno byc w petli
+    if(newSd < 0) {
         cerr << "Error accepting request from client!" << endl;
         exit(1);
     }
     cout << "Connected with client!" << endl;
+
     //lets keep track of the session time
     struct timeval start1, end1;
     gettimeofday(&start1, NULL);
@@ -462,7 +456,7 @@ int main(int argc, char *argv[])
     {
         //receive a message from the client (listen)
         cout << "Awaiting client response..." << endl;
-        memset(&msg, 0, sizeof(msg));//clear the buffer
+        memset(&msg, 0, sizeof(msg));                                   //clear the buffer
         bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
         if(!strcmp(msg, "exit"))
         {
@@ -473,7 +467,7 @@ int main(int argc, char *argv[])
         cout << ">";
         string data;
         getline(cin, data);
-        memset(&msg, 0, sizeof(msg)); //clear the buffer
+        memset(&msg, 0, sizeof(msg));                                   //clear the buffer
         strcpy(msg, data.c_str());
         if(data == "exit")
         {

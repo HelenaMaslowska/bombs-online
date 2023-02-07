@@ -25,15 +25,17 @@ public:
     ~MainWindow();
 
 
-private slots:
+public slots:
     void on_startBtn_clicked();
     void on_exitBtn_clicked();
     void read_data_from_server();
+    //void send_data_to_server();
 
 private:
     Ui::MainWindow *ui;
     Game *game;
     QTcpSocket *TCPSocket;
     QTimer * timer;
+    int status = 1;
 };
 #endif // MAINWINDOW_H

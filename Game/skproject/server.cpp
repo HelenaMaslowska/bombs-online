@@ -16,7 +16,12 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <pthread.h>
+#include <errno.h> 
 using namespace std;
+#define TRUE   1 
+#define FALSE  0 
+#define PORT 8080
 //Server side
 /*
 
@@ -25,6 +30,7 @@ g++ server.cpp -o server
 
 */
 string map_files[8] = {"Maps/map1.txt","Maps/map2.txt","Maps/map3.txt","Maps/map4.txt","Maps/map5.txt","Maps/map6.txt","Maps/map7.txt","Maps/map8.txt"};
+     
 
 
 struct Player{
@@ -344,7 +350,7 @@ struct Game{
 		}
         	return 0;
 	}
-
+	
 	string drawGame()
 	{
 		int ile=0;
@@ -388,8 +394,7 @@ struct Game{
 			send+=to_string(gracze[i].hp)+";";
 			send+=to_string(gracze[i].bombStr)+";";
 			send+=to_string(gracze[i].maxBombs)+";";
-			int speed = gracze[i].speed*100;
-			send+=to_string(speed)+";";
+			send+=to_string(gracze[i].curBombs)+";";
 			if(gracze[i].invulnerable>0)
 			{
 				send+="1;";
@@ -402,91 +407,241 @@ struct Game{
 	}
 };
 
-int main(int argc, char *argv[])
-{
-    char msg[1500];                                             // buffer to send and receive messages with
 
-    if(argc != 2) {                                             // for the server, we only need to specify a port number
-        cerr << "Usage: port" << endl;
-        exit(0);
-    }
-    int port = atoi(argv[1]);                                   // grab the port number
+int main(int argc , char *argv[])  
+{  
+    int opt = 1,  max_clients = 100, client_socket[100];  
+    int master_socket, addrlen, new_socket, activity, i, valread, sd, max_sd;  
+    struct sockaddr_in address;  
+    char buffer[1500]; 
+    //set of socket descriptors 
+    fd_set readfds;  
+    //a message 
+    std::string s = "ECHO Daemon v1.0 \r\n";
+    char *message = &s[0];  
+     
+    //initialise all client_socket[] to 0 so not checked 
+    for (i = 0; i < max_clients; i++)  
+    {  
+        client_socket[i] = 0;  
+    }  
+         
+    //create a master socket 
+    if( (master_socket = socket(AF_INET , SOCK_STREAM , 0)) == 0)  
+    {  
+        perror("socket failed");  
+        exit(EXIT_FAILURE);  
+    }  
+     
+    //set master socket to allow multiple connections , 
+    //this is just a good habit, it will work without this 
+    if( setsockopt(master_socket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, 
+          sizeof(opt)) < 0 )  
+    {  
+        perror("setsockopt");  
+        exit(EXIT_FAILURE);  
+    }  
+     
+    //type of socket created 
+    address.sin_family = AF_INET;  
+    address.sin_addr.s_addr = INADDR_ANY;  
+    address.sin_port = htons( PORT );  
+         
+    //bind the socket to localhost port 8888 
+    if (bind(master_socket, (struct sockaddr *)&address, sizeof(address))<0)  
+    {  
+        perror("bind failed");  
+        exit(EXIT_FAILURE);  
+    }  
+    printf("Listener on port %d \n", PORT);  
+         
+    //try to specify maximum of 3 pending connections for the master socket 
+    if (listen(master_socket, 3) < 0)  
+    {  
+        perror("listen");  
+        exit(EXIT_FAILURE);  
+    }  
+         
+    //accept the incoming connection 
+    addrlen = sizeof(address);  
+    puts("Waiting for connections ...");  
+         
+    while(TRUE)  
+    {  
+        //clear the socket set 
+        FD_ZERO(&readfds);  
+     
+        //add master socket to set 
+        FD_SET(master_socket, &readfds);  
+        max_sd = master_socket;  
+             
+        //add child sockets to set 
+        for ( i = 0 ; i < max_clients ; i++)  
+        {  
+            //socket descriptor 
+            sd = client_socket[i];  
+                 
+            //if valid socket descriptor then add to read list 
+            if(sd > 0)  
+                FD_SET( sd , &readfds);  
+                 
+            //highest file descriptor number, need it for the select function 
+            if(sd > max_sd)  
+                max_sd = sd;  
+        }  
+     
+        //wait for an activity on one of the sockets , timeout is NULL , 
+        //so wait indefinitely 
+        activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);  
+       
+        if ((activity < 0) && (errno!=EINTR))  
+        {  
+            printf("select error");  
+        }  
+             
+        //If something happened on the master socket , 
+        //then its an incoming connection 
+        if (FD_ISSET(master_socket, &readfds))  
+        {  
+            if ((new_socket = accept(master_socket, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)	{ perror("accept"); exit(EXIT_FAILURE); }  
+             
+            //inform user of socket number - used in send and receive commands 
+            printf("New connection, socket fd is %d, ip is : %s, port : %d \n", new_socket, inet_ntoa(address.sin_addr), ntohs(address.sin_port));  
+           
+            //send new connection greeting message 
+            if( send(new_socket, message, strlen(message), 0) != strlen(message) )		{ perror("send"); }  
+                 
+            puts("Welcome message sent successfully");  
+                 
+            //add new socket to array of sockets 
+            for (i = 0; i < max_clients; i++)  
+            {  
+                //if position is empty 
+                if( client_socket[i] == 0 )  
+                {  
+                    client_socket[i] = new_socket;  
+                    printf("Adding to list of sockets as %d\n" , i);  
+                         
+                    break;  
+                }  
+            }  
+        }  
+             
+        //else its some IO operation on some other socket
+        for (i = 0; i < max_clients; i++)  
+        {  
+            sd = client_socket[i];  
+			
+            if (FD_ISSET( sd , &readfds))  
+            {  
+                //Check if it was for closing , and also read the 
+                //incoming message 
+				
+                if ((valread = read( sd , buffer, 1024)) == 0)  
+                {  
+					printf(valread);  
+                    //Somebody disconnected , get his details and print 
+                    getpeername(sd , (struct sockaddr*)&address, (socklen_t*)&addrlen);  
+                    printf("Host disconnected , ip %s , port %d \n" , 
+                          inet_ntoa(address.sin_addr) , ntohs(address.sin_port));  
+                         
+                    //Close the socket and mark as 0 in list for reuse 
+                    close( sd );  
+                    client_socket[i] = 0;  
+                }  
+                     
+                //Echo back the message that came in 
+                else 
+                {  
+                    //set the string terminating NULL byte on the end 
+                    //of the data read 
+                    buffer[valread] = '\0';  
 
-    //setup a socket and connection tools
-    sockaddr_in servAddr;
-    bzero((char*)&servAddr, sizeof(servAddr));
-    servAddr.sin_family = AF_INET;
-    servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servAddr.sin_port = htons(port);
+                    send(sd , buffer , strlen(buffer) , 0 );  
+                }  
+            }  
+        }  
+    }  
+         
+    return 0;  
+}  
 
-    //open stream oriented socket with internet address
-    //also keep track of the socket descriptor
-    int serverSd = socket(AF_INET, SOCK_STREAM, 0);
-    if(serverSd < 0) {
-        cerr << "Error establishing the server socket" << endl;
-        exit(0);
-    }
-    //bind the socket to its local address
-    int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr, sizeof(servAddr));
-    if(bindStatus < 0) {
-        cerr << "Error binding socket to local address" << endl;
-        exit(0);
-    }
-    cout << "Waiting for a client to connect..." << endl;
-    //listen for up to 5 requests at a time
-    listen(serverSd, 5);
-    //receive a request from client using accept
-    //we need a new address to connect with the client
-    sockaddr_in newSockAddr;
-    socklen_t newSockAddrSize = sizeof(newSockAddr);
-    //accept, create a new socket descriptor to
-    //handle the new connection with client
-    int newSd = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize); //wiecej acceptów żeby przyjac klientów, powinno byc w petli
-    if(newSd < 0) {
-        cerr << "Error accepting request from client!" << endl;
-        exit(1);
-    }
-    cout << "Connected with client!" << endl;
 
-    //lets keep track of the session time
-    struct timeval start1, end1;
-    gettimeofday(&start1, NULL);
-    //also keep track of the amount of data sent as well
-    int bytesRead, bytesWritten = 0;
-    while(1)
-    {
-        //receive a message from the client (listen)
-        cout << "Awaiting client response..." << endl;
-        memset(&msg, 0, sizeof(msg));                                   //clear the buffer
-        bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
-        if(!strcmp(msg, "exit"))
-        {
-            cout << "Client has quit the session" << endl;
-            break;
-        }
-        cout << "Client: " << msg << endl;
-        cout << ">";
-        string data;
-        getline(cin, data);
-        memset(&msg, 0, sizeof(msg));                                   //clear the buffer
-        strcpy(msg, data.c_str());
-        if(data == "exit")
-        {
-            //send to the client that server has closed the connection
-            send(newSd, (char*)&msg, strlen(msg), 0);
-            break;
-        }
-        //send the message to client
-        bytesWritten += send(newSd, (char*)&msg, strlen(msg), 0);
-    }
-    //we need to close the socket descriptors after we're all done
-    gettimeofday(&end1, NULL);
-    close(newSd);
-    close(serverSd);
-    cout << "********Session********" << endl;
-    cout << "Bytes written: " << bytesWritten << " Bytes read: " << bytesRead << endl;
-    cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec)
-        << " secs" << endl;
-    cout << "Connection closed..." << endl;
-    return 0;
-}
+
+
+// int main(int argc, char *argv[])
+// {
+//     char msg[1500];                                             // buffer to send and receive messages with
+//     sockaddr_in servAddr;
+//     sockaddr_in newSockAddr;
+//     socklen_t newSockAddrSize = sizeof(newSockAddr);
+//     struct timeval start1, end1;
+
+//     if(argc != 2) { cerr << "Usage: port" << endl; exit(0); }
+//     int port = atoi(argv[1]);                                   // grab the port number
+    
+//     bzero((char*)&servAddr, sizeof(servAddr));					//setup a socket and connection tools
+//     servAddr.sin_family = AF_INET;
+//     servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+//     servAddr.sin_port = htons(port);
+ 
+//     int serverSd = socket(AF_INET, SOCK_STREAM, 0);
+//     if(serverSd < 0) { cerr << "Error establishing the server socket" << endl; exit(0); }
+//     int bindStatus = bind(serverSd, (struct sockaddr*)&servAddr, sizeof(servAddr));	
+//     if(bindStatus < 0) { cerr << "Error binding socket to local address" << endl; exit(0); }
+//     cout << "Waiting for connect..." << endl;
+
+//     listen(serverSd, 5);    									//listen for up to 5 requests at a time, suggestion
+
+//     int newSd = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize); //wiecej acceptów żeby przyjac klientów, powinno byc w petli
+
+//     if(newSd < 0) {
+//         cerr << "Error accepting request from client!" << endl;
+//         exit(1);
+//     }
+//     cout << "Connected with client!" << endl;
+// 	int newSd2 = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize); //wiecej acceptów żeby przyjac klientów, powinno byc w petli
+//     if(newSd2 < 0) {
+//         cerr << "Error accepting request from client2!" << endl;
+//         exit(1);
+//     }
+//     cout << "Connected with client2!" << endl;
+
+//     // gettimeofday(&start1, NULL);
+//     //also keep track of the amount of data sent as well
+//     int bytesRead, bytesWritten = 0;
+//     while(1)
+//     {
+//         //receive a message from the client (listen)
+//         cout << "Awaiting client response..." << endl;
+//         memset(&msg, 0, sizeof(msg));                                   //clear the buffer
+//         bytesRead += recv(newSd, (char*)&msg, sizeof(msg), 0);
+//         if(!strcmp(msg, "exit"))
+//         {
+//             cout << "Client has quit the session" << endl;
+//             break;
+//         }
+//         cout << "Client: " << msg << endl;
+//         cout << ">";
+//         string data;
+//         getline(cin, data);
+//         memset(&msg, 0, sizeof(msg));                                   //clear the buffer
+//         strcpy(msg, data.c_str());
+//         if(data == "exit") {
+//             send(newSd, (char*)&msg, strlen(msg), 0);            //send to the client that server has closed the connection
+//             break;
+//         }
+//         //send the message to client
+//         bytesWritten += send(newSd, (char*)&msg, strlen(msg), 0);
+//     }
+//     //we need to close the socket descriptors after we're all done
+//     // gettimeofday(&end1, NULL);
+//     close(newSd);
+//     close(serverSd);
+//     // cout << "********Session********" << endl;
+//     // cout << "Bytes written: " << bytesWritten << " Bytes read: " << bytesRead << endl;
+//     // cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) 
+//     //     << " secs" << endl;
+//     cout << "Connection closed..." << endl;
+//     return 0;   
+// }

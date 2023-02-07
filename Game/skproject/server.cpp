@@ -344,7 +344,7 @@ struct Game{
 		}
         	return 0;
 	}
-	
+
 	string drawGame()
 	{
 		int ile=0;
@@ -388,7 +388,8 @@ struct Game{
 			send+=to_string(gracze[i].hp)+";";
 			send+=to_string(gracze[i].bombStr)+";";
 			send+=to_string(gracze[i].maxBombs)+";";
-			send+=to_string(gracze[i].curBombs)+";";
+			int speed = gracze[i].speed*100;
+			send+=to_string(speed)+";";
 			if(gracze[i].invulnerable>0)
 			{
 				send+="1;";
@@ -404,20 +405,20 @@ struct Game{
 int main(int argc, char *argv[])
 {
     char msg[1500];                                             // buffer to send and receive messages with
-    
+
     if(argc != 2) {                                             // for the server, we only need to specify a port number
         cerr << "Usage: port" << endl;
         exit(0);
     }
     int port = atoi(argv[1]);                                   // grab the port number
-    
+
     //setup a socket and connection tools
     sockaddr_in servAddr;
     bzero((char*)&servAddr, sizeof(servAddr));
     servAddr.sin_family = AF_INET;
     servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servAddr.sin_port = htons(port);
- 
+
     //open stream oriented socket with internet address
     //also keep track of the socket descriptor
     int serverSd = socket(AF_INET, SOCK_STREAM, 0);
@@ -438,7 +439,7 @@ int main(int argc, char *argv[])
     //we need a new address to connect with the client
     sockaddr_in newSockAddr;
     socklen_t newSockAddrSize = sizeof(newSockAddr);
-    //accept, create a new socket descriptor to 
+    //accept, create a new socket descriptor to
     //handle the new connection with client
     int newSd = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize); //wiecej acceptów żeby przyjac klientów, powinno byc w petli
     if(newSd < 0) {
@@ -484,8 +485,8 @@ int main(int argc, char *argv[])
     close(serverSd);
     cout << "********Session********" << endl;
     cout << "Bytes written: " << bytesWritten << " Bytes read: " << bytesRead << endl;
-    cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) 
+    cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec)
         << " secs" << endl;
     cout << "Connection closed..." << endl;
-    return 0;   
+    return 0;
 }

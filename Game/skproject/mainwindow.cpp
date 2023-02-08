@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     game = new Game();
     TCPSocket = new QTcpSocket();
-    TCPSocket->connectToHost(QHostAddress::LocalHost, 8080); //TCPSocket->connectToHost(QHostAddress(127.0.0.1), 8080);
+    TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);        //TCPSocket->connectToHost(QHostAddress(127.0.0.1), 8080);
     connect(TCPSocket,SIGNAL(readyRead()), this, SLOT(read_data_from_server()));
     //connect(TCPSocket, SIGNAL(bytesWritten(qint64)),this->game, SLOT(send_data_to_server())); //doesnt work
     TCPSocket->open(QIODevice::ReadWrite);

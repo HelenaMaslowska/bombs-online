@@ -10,6 +10,7 @@
 #include <QFile>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 namespace Ui
 {
@@ -26,9 +27,11 @@ public:
     QString getNickname();
     void setNickname(QString nickname);
 
+    void updateDataFromServer(QString serverData);
     void serverData(QString inputData);
     void setData(QString data);
     void setDataList();
+    void setDataSublists();
     void setDataSize();
     bool legal();
     void setNicksOnTheRight();
@@ -50,6 +53,12 @@ public:
     bool move = "d";
     QString data;
     QStringList dataList;
+    QStringList dataListBricks;
+    QStringList dataListBombs;
+    QStringList dataListRangeBombs;
+    QStringList dataListStats;
+    int players;
+    int playerDataSize = 8;
     int dataSize = 0;
 };
 

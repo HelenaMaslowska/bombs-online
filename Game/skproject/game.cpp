@@ -90,19 +90,11 @@ void Game::setNicksOnTheRight()
 
 /*
  * Update text when it comes from the server.
- * TODO
- *  - edit default strings to strings in parameter data
 */
 void Game::setDataOnTheRight()
 {
     if (this->dataList[1] == "game" && legal())
     {
-//        int skipPosDataA = 0, skipPosDataB = 0, skipPosDataC = 0, skip = 2, skipMove = 3, playerDataSize = 8;
-//        skipPosDataA = (this->dataList[skip]).toInt() * 2 + 1;              // 3; 1;1; 1;1; 1;1 = 7 pos
-//        skipPosDataB = (this->dataList[skip+skipPosDataA].toInt() * 2 + 1); // 4; 1;1; 1;1; 1;1; 1;1; = 9 pos
-//        skipPosDataC = (this->dataList[skip+skipPosDataA+skipPosDataB].toInt() * 3 + 1);
-//        int i = skipPosDataA + skipPosDataB + skipPosDataC + skip + skipMove + 1;      // example: 2 + 7 + 9 + 3 = 21 pos
-//        int players = this->dataList[skipPosDataA + skipPosDataB + skipPosDataC + skip].toInt();
         int i = 3;
         ui->HP_1->setText(this->dataListStats[i]);
         ui->Speed_1->setText(this->dataListStats[i+1]);
@@ -226,42 +218,6 @@ void Game::paintEvent(QPaintEvent *event)
     }
     pen.setColor(Qt::black);
 
-}
-
-void Game::paintMap()
-{
-    int margin = ui->frame->x();
-    int block_size = 32;
-    QPainter painter(this);
-    QPen pen;
-    painter.setPen(pen);
-    auto map = openMap();
-    for (int i=0;i < 15; i++)
-    {
-        for (int j=0;j < 15; j++)
-        {
-            if(map[i].toStdString()[j] == '1')
-            {
-                painter.setBrush(Qt::SolidPattern);
-                pen.setColor(Qt::black);
-                painter.drawRect(QRect(i*block_size+margin, j*block_size+margin, block_size, block_size));
-            }
-            if(map[i].toStdString()[j] == '3')      // bombs damage, change to 2 to see them
-            {
-                painter.setBrush(Qt::SolidPattern);
-                painter.drawEllipse(QPointF(i*(block_size)+margin+block_size/2,j*block_size+margin+block_size/2), block_size/4, block_size/4);
-            }
-        }
-    }
-    for(int i=1 ; i+1< this->dataListBricks.size(); i+=2)
-    {
-        int x = this->dataListBricks[i].toInt();
-        int y = this->dataListBricks[i+1].toInt();
-        painter.setBrush(Qt::DiagCrossPattern);
-        painter.drawRect(QRect(x*block_size+margin,
-                               y*block_size+margin,
-                               block_size, block_size));
-    }
 }
 
 //void Game::closeEvent(QCloseEvent *event)  // show prompt when user wants to close app {

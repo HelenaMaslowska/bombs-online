@@ -40,8 +40,6 @@ public:
     bool legal();
 
     virtual void paintEvent(QPaintEvent *event);
-    void paintMap();
-    void repaintMap();
     //void closeEvent(QCloseEvent *event);
 
 public slots:

@@ -8,11 +8,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     TCPSocket = new QTcpSocket();
     TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);        //TCPSocket->connectToHost(QHostAddress(127.0.0.1), 8080);
     connect(TCPSocket,SIGNAL(readyRead()), this, SLOT(read_data_from_server()));
+
+    //connect(game, this, game->on_readyBtn_clicked);
     //connect(TCPSocket, SIGNAL(bytesWritten(qint64)),this->game, SLOT(send_data_to_server())); //doesnt work
     TCPSocket->open(QIODevice::ReadWrite);
 //    if (TCPSocket->isOpen()) { QMessageBox::information(this, "Hej! Miłego kodowania!", "Połączyłaś się ez"); }
 }
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() {
+    if(TCPSocket) TCPSocket->close();
+    delete ui;
+}
 
 /*
  * When you click startBtn then MainWindow send nickname to the server.
@@ -93,31 +98,31 @@ void MainWindow::read_data_from_server()
     }
 }
 
-//void MainWindow::send_data_to_server()
-//{
-//    QString tru;
-//    if (TCPSocket && TCPSocket->isOpen())
-//    {
-//        if(game->exit)
-//        {
-//            TCPSocket->write("!;exit;?");
-//            game->exit == false;
-//        }
-//        if (game->ready)
-//        {
-//            QString sendMessage = "!;rdy;1;?";
-//            TCPSocket->write(sendMessage.toStdString().c_str());
-//        }
-//        if(game->ready)
+void MainWindow::send_data_to_server()
+{
+    QString tru;
+    //if (game->)
+    {
+        if(game->exit)
+        {
+            TCPSocket->write("!;exit;?");
+            game->exit == false;
+        }
+        if (game->ready)
+        {
+            QString sendMessage = "!;rdy;1;?";
+            TCPSocket->write(sendMessage.toStdString().c_str());
+        }
+        if(game->ready)
 
-//        TCPSocket->write((game->ready == 1 ? "ready" : "not ready"));
-//        if (!game->ready)
-//        {
-//            QString sendMessage = "!;rdy;0;?";
-//            TCPSocket->write(sendMessage.toStdString().c_str());
-//        }
-//    }
-//}
+        TCPSocket->write((game->ready == 1 ? "ready" : "not ready"));
+        if (!game->ready)
+        {
+            QString sendMessage = "!;rdy;0;?";
+            TCPSocket->write(sendMessage.toStdString().c_str());
+        }
+    }
+}
 
 
 

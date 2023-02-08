@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <bits/stdc++.h>
 
 namespace Ui
 {
@@ -26,20 +27,24 @@ public:
     ~Game();
     QString getNickname();
     void setNickname(QString nickname);
-
-    void updateDataFromServer(QString serverData);
-    void serverData(QString inputData);
+    void setMap(int nr);
     void setData(QString data);
     void setDataList();
     void setDataSublists();
     void setDataSize();
-    bool legal();
     void setNicksOnTheRight();
     void setDataOnTheRight();
+
+    void updateDataFromServer(QString serverData);
+    void serverData(QString inputData);
+    bool legal();
+
     virtual void paintEvent(QPaintEvent *event);
+    void paintMap();
+    void repaintMap();
     //void closeEvent(QCloseEvent *event);
 
-private slots:
+public slots:
     void on_readyBtn_clicked();
     void on_exitBtn_clicked();
 
@@ -57,6 +62,7 @@ public:
     QStringList dataListBombs;
     QStringList dataListRangeBombs;
     QStringList dataListStats;
+    int mapNumber = 1;
     int players;
     int playerDataSize = 8;
     int dataSize = 0;

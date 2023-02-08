@@ -10,7 +10,7 @@ Game::Game(QWidget *parent) : QFrame(parent), ui(new Ui::Game)
 Game::~Game(){ delete ui; }
 
 QString Game::getNickname()                 { return this->nickname; }
-
+void Game::setMap(int nr)                   { this->mapNumber = nr; }
 void Game::setNickname(QString nickname)    { this->nickname = nickname; }
 void Game::setData(QString data)            { this->data = data; }
 void Game::setDataList()                    { this->dataList = this->data.split(";"); }
@@ -32,8 +32,8 @@ void Game::setDataSublists() //dataList: Bombs, Bricks, RangeBombs, Player Stats
         this->dataListBombs = this->dataList.sliced(skipPosDataA+skip, skipPosDataB);
         this->dataListRangeBombs = this->dataList.sliced(skipPosDataA+skipPosDataB+skip, skipPosDataC);
         this->dataListStats = this->dataList.sliced(i + 1, this->playerDataSize*players); //1 is for skip the number of players
-        ui->console->setText(this->dataListBricks.join(",") + "\n" + this->dataListBombs.join(",")+
-                             + "\n" + this->dataListRangeBombs.join(",") + "\n" + this->dataListStats.join(","));
+        //ui->console->setText(this->dataListBricks.join(",") + "\n" + this->dataListBombs.join(",")+
+        //                     + "\n" + this->dataListRangeBombs.join(",") + "\n" + this->dataListStats.join(","));
     }
 }
 bool Game::legal()
@@ -61,9 +61,10 @@ void Game::updateDataFromServer(QString serverData)
 void Game::serverData(QString serverData)
 {
     //inputData.sliced(0, inputData.size());
-    this->updateDataFromServer(serverData);
+    this->updateDataFromServer(serverData);     // NEED TO BE FIRST, SET DATA IN CLASS
     this->setNicksOnTheRight();
     this->setDataOnTheRight();
+    this->update();
 }
 
 /*
@@ -74,6 +75,7 @@ void Game::setNicksOnTheRight()
     if (this->dataList[1] == "nicks" && legal())
     {
         QStringList names = this->dataList;
+        //int index = this->dataList.at(this->nickname);       // TODO update accessibility correctly, now is 3 next
         names.removeOne(this->nickname);
         // pieces[0] = pieces[0].last(pieces[0].size()-1);
         ui->Player1->setTitle(this->nickname);
@@ -148,7 +150,7 @@ void Game::setDataOnTheRight()
 
 QString* openMap()
 {
-    QFile file = QFile("/home/helena/Projekt/skproject/map3.txt");
+    QFile file = QFile("/home/helena/Projekt/skproject/map1.txt");
     if(!file.exists())                  { qCritical() << "File not found";   }
     if(!file.open(QIODevice::ReadOnly)) { qCritical() << file.errorString(); }
     QTextStream stream(&file);
@@ -167,10 +169,11 @@ QString* openMap()
 
 void Game::paintEvent(QPaintEvent *event)
 {
-    int margin = 20;
+    int margin = ui->frame->x();
     int block_size = 32;
     QPainter painter(this);
     QPen pen;
+    pen.setWidth(3);
     painter.setPen(pen);
     auto map = openMap();
 //    for(int i =0; i< 15; i++) { std::cout << map[i].toStdString() << std::endl; }
@@ -184,9 +187,63 @@ void Game::paintEvent(QPaintEvent *event)
                 pen.setColor(Qt::black);
                 painter.drawRect(QRect(i*block_size+margin, j*block_size+margin, block_size, block_size));
             }
-            if(map[i].toStdString()[j] == '2')
+//            if(map[i].toStdString()[j] == '2')
+//            {
+//                painter.setBrush(Qt::DiagCrossPattern);
+//                painter.drawRect(QRect(i*block_size+margin, j*block_size+margin, block_size, block_size));
+//            }
+//            if(map[i].toStdString()[j] == '3')      // bombs damage, change to 2 to see them
+//            {
+//                painter.setBrush(Qt::SolidPattern);
+//                painter.drawEllipse(QPointF(i*(block_size)+margin+block_size/2,j*block_size+margin+block_size/2), block_size/4, block_size/4);
+//            }
+        }
+    }
+    for(int i=1 ; i+1< this->dataListBricks.size(); i+=2)
+    {
+        int x = this->dataListBricks[i].toInt();
+        int y = this->dataListBricks[i+1].toInt();
+        painter.setBrush(Qt::DiagCrossPattern);
+        painter.drawRect(QRect(y*block_size+margin, x*block_size+margin, block_size, block_size));
+    }
+    for(int i=1 ; i+1< this->dataListBombs.size(); i+=2)
+    {
+        int x = this->dataListBombs[i].toInt();
+        int y = this->dataListBombs[i+1].toInt();
+        painter.setBrush(Qt::SolidPattern);
+        painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size/4, block_size/4);
+    }
+    for(int i=0 ; i+7 < this->dataListStats.size(); i+=8)   // TODO poprawić na większą precyzję bo narazie przyjmuje tylko zaokrąglone do setek
+    {
+        float x = round(this->dataListStats[i].toFloat()/100);
+        float y = round(this->dataListStats[i+1].toFloat()/100);
+        painter.setBrush(Qt::SolidPattern);
+        pen.setColor(Qt::red);
+        painter.setPen(pen);
+        painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
+        ui->console->setText(QString::fromStdString(std::__cxx11::to_string(y*block_size+margin+block_size/2)));
+
+    }
+    pen.setColor(Qt::black);
+
+}
+
+void Game::paintMap()
+{
+    int margin = ui->frame->x();
+    int block_size = 32;
+    QPainter painter(this);
+    QPen pen;
+    painter.setPen(pen);
+    auto map = openMap();
+    for (int i=0;i < 15; i++)
+    {
+        for (int j=0;j < 15; j++)
+        {
+            if(map[i].toStdString()[j] == '1')
             {
-                painter.setBrush(Qt::DiagCrossPattern);
+                painter.setBrush(Qt::SolidPattern);
+                pen.setColor(Qt::black);
                 painter.drawRect(QRect(i*block_size+margin, j*block_size+margin, block_size, block_size));
             }
             if(map[i].toStdString()[j] == '3')      // bombs damage, change to 2 to see them
@@ -196,22 +253,22 @@ void Game::paintEvent(QPaintEvent *event)
             }
         }
     }
+    for(int i=1 ; i+1< this->dataListBricks.size(); i+=2)
+    {
+        int x = this->dataListBricks[i].toInt();
+        int y = this->dataListBricks[i+1].toInt();
+        painter.setBrush(Qt::DiagCrossPattern);
+        painter.drawRect(QRect(x*block_size+margin,
+                               y*block_size+margin,
+                               block_size, block_size));
+    }
 }
 
-//void Game::closeEvent(QCloseEvent *event)  // show prompt when user wants to close app
-//{
+//void Game::closeEvent(QCloseEvent *event)  // show prompt when user wants to close app {
 //    event->ignore();
 //    if (QMessageBox::Yes == QMessageBox::question(this, "Exit?", "You will lose if you exit!", QMessageBox::Yes | QMessageBox::No))
-//    {
-//        this->exit = true;
-//        event->accept();
-//    }
-//    else
-//    {
-//        this->exit = false;
-//    }
-
-//}
+//    { this->exit = true; event->accept(); }
+//    else { this->exit = false; } }
 
 void Game::on_readyBtn_clicked()
 {

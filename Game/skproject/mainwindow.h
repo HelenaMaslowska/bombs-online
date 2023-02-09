@@ -25,11 +25,12 @@ public:
     ~MainWindow();
 
 
-public slots:
+private slots:
     void on_startBtn_clicked();
     void on_exitBtn_clicked();
     void read_data_from_server();
     void send_data_to_server();
+    //void keyPressed();
 
 private:
     Ui::MainWindow *ui;

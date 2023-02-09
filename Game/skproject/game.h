@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QString>
 #include <QFile>
+#include <QKeyEvent>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -27,7 +28,7 @@ public:
     ~Game();
     QString getNickname();
     void setNickname(QString nickname);
-    void setMap(int nr);
+    void setMap(QString nr);
     void setData(QString data);
     void setDataList();
     void setDataSublists();
@@ -38,29 +39,38 @@ public:
     void updateDataFromServer(QString serverData);
     void serverData(QString inputData);
     bool legal();
-
+    QString* openMap();
     virtual void paintEvent(QPaintEvent *event);
     //void closeEvent(QCloseEvent *event);
+
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 public slots:
     void on_readyBtn_clicked();
     void on_exitBtn_clicked();
 
-private:
+signals:
+    void keyboardUp();
+    void keyboardDown();
+    void keyboardLeft();
+    void keyboardRight();
+
+public:
     Ui::Game *ui;
     QString nickname;
 
 public:
     bool ready = 0;
     bool exit = 0;
-    bool move = "d";
+    QString move = "d";
     QString data;
     QStringList dataList;
     QStringList dataListBricks;
     QStringList dataListBombs;
     QStringList dataListRangeBombs;
     QStringList dataListStats;
-    int mapNumber = 1;
+    QString mapNumber = "1";
     int players;
     int playerDataSize = 8;
     int dataSize = 0;

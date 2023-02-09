@@ -6,10 +6,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     game = new Game();
     TCPSocket = new QTcpSocket();
-    TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);        //TCPSocket->connectToHost(QHostAddress(127.0.0.1), 8080);
+    TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);
     connect(TCPSocket,SIGNAL(readyRead()), this, SLOT(read_data_from_server()));
+    connect(game, SIGNAL(keyboardUp()), this, SLOT(read_data_from_server()));
+    connect(game, SIGNAL(keyboardDown()), this, SLOT(keyPressedDown()));
+    connect(game, SIGNAL(keyboardLeft()), this, SLOT(keyPressedLeft()));
+    connect(game, SIGNAL(keyboardRight()), this, SLOT(keyPressedRight()));
 
-    //connect(game, this, game->on_readyBtn_clicked);
     //connect(TCPSocket, SIGNAL(bytesWritten(qint64)),this->game, SLOT(send_data_to_server())); //doesnt work
     TCPSocket->open(QIODevice::ReadWrite);
 //    if (TCPSocket->isOpen()) { QMessageBox::information(this, "Hej! Miłego kodowania!", "Połączyłaś się ez"); }
@@ -26,8 +29,8 @@ MainWindow::~MainWindow() {
  */
 void MainWindow::on_startBtn_clicked() // send nickname to the server
 {
-    //if (TCPSocket)
-    if (TCPSocket->isOpen())
+    //if ()
+    if (TCPSocket && TCPSocket->isOpen())
     {
         QString prefix = "nick;";
         QString nick = (ui->nickInput->text());
@@ -36,7 +39,7 @@ void MainWindow::on_startBtn_clicked() // send nickname to the server
         TCPSocket->write(sendMessage.toStdString().c_str());
         game->setNickname(nick);
         game->show();
-        this->hide();
+        //this->hide();
         this->status = 2;
     }
     else { QMessageBox::information(this, "Hej! Miłego debugowania!", TCPSocket->errorString()); }
@@ -49,6 +52,14 @@ void MainWindow::on_exitBtn_clicked()
 {
     this->close();
 }
+
+//void MainWindow::keyPressedUp()
+//{
+//    if (TCPSocket && TCPSocket->isOpen())
+//    {
+//        TCPSocket->write("!;up;?");
+//    }
+//}
 
 /*
  * Read and send data from server at once.
@@ -68,6 +79,10 @@ void MainWindow::read_data_from_server()
             //while (DataIn.atEnd() == false) { DataIn >> MessageString; }
 
             ui->nickInput->setText(MessageString);
+            if (this->status <= 2 && MessageString.split(";")[1] == "map")
+            {
+                game->mapNumber = MessageString.split(";")[2];
+            }
             game->serverData(MessageString);
             //game->setNicksOnTheRight(MessageString);
             MessageString = "";
@@ -77,6 +92,7 @@ void MainWindow::read_data_from_server()
                 TCPSocket->write("!;exit;?");
                 game->exit == false;
             }
+
             if (this->status == 2)
             {
                 if (game->ready)
@@ -84,7 +100,7 @@ void MainWindow::read_data_from_server()
                     QString sendMessage = "!;rdy;1;?";
                     TCPSocket->write(sendMessage.toStdString().c_str());
                 }
-                else if (!game->ready)
+                else if(!game->ready)
                 {
                     QString sendMessage = "!;rdy;0;?";
                     TCPSocket->write(sendMessage.toStdString().c_str());
@@ -92,7 +108,31 @@ void MainWindow::read_data_from_server()
             }
             if(this->status == 3)
             {
-
+                if(game->move == "u")
+                {
+                    QString sendMessage = "!;go;u;?";
+                    TCPSocket->write(sendMessage.toStdString().c_str());
+                }
+                if(game->move == "d")
+                {
+                    QString sendMessage = "!;go;d;?";
+                    TCPSocket->write(sendMessage.toStdString().c_str());
+                }
+                if(game->move == "l")
+                {
+                    QString sendMessage = "!;go;l;?";
+                    TCPSocket->write(sendMessage.toStdString().c_str());
+                }
+                if(game->move == "r")
+                {
+                    QString sendMessage = "!;go;r;?";
+                    TCPSocket->write(sendMessage.toStdString().c_str());
+                }
+                if(game->move == "b")
+                {
+                    QString sendMessage = "!;go;b;?";
+                    TCPSocket->write(sendMessage.toStdString().c_str());
+                }
             }
         }
     }

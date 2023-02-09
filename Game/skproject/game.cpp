@@ -10,7 +10,7 @@ Game::Game(QWidget *parent) : QFrame(parent), ui(new Ui::Game)
 Game::~Game(){ delete ui; }
 
 QString Game::getNickname()                 { return this->nickname; }
-void Game::setMap(int nr)                   { this->mapNumber = nr; }
+void Game::setMap(QString nr)               { this->mapNumber = nr; }
 void Game::setNickname(QString nickname)    { this->nickname = nickname; }
 void Game::setData(QString data)            { this->data = data; }
 void Game::setDataList()                    { this->dataList = this->data.split(";"); }
@@ -18,7 +18,7 @@ void Game::setDataSize()                    { this->dataSize = this->dataList.si
 
 void Game::setDataSublists() //dataList: Bombs, Bricks, RangeBombs, Player Stats
 {
-    if(this->dataList[1] == "game")
+    if(legal() && this->dataList[1] == "game")
     {
         int skipPosDataA, skipPosDataB, skipPosDataC, skip = 2;
         skipPosDataA = this->dataList[skip].toInt() * 2 + 1;                // 3; 1;1; 1;1; 1;1 = 2*3+1 = 7 pos
@@ -60,7 +60,7 @@ void Game::updateDataFromServer(QString serverData)
  */
 void Game::serverData(QString serverData)
 {
-    //inputData.sliced(0, inputData.size());
+    //this->ui->console->setText(serverData.split(";").join("a"));
     this->updateDataFromServer(serverData);     // NEED TO BE FIRST, SET DATA IN CLASS
     this->setNicksOnTheRight();
     this->setDataOnTheRight();
@@ -72,19 +72,19 @@ void Game::serverData(QString serverData)
  */
 void Game::setNicksOnTheRight()
 {
-    if (this->dataList[1] == "nicks" && legal())
+    if (legal() && this->dataList[1] == "nicks")
     {
         QStringList names = this->dataList;
         //int index = this->dataList.at(this->nickname);       // TODO update accessibility correctly, now is 3 next
-        names.removeOne(this->nickname);
-        // pieces[0] = pieces[0].last(pieces[0].size()-1);
-        ui->Player1->setTitle(this->nickname);
-        ui->Player2->setTitle(names[2]);
-        ui->Player3->setTitle(names[3]);
-        ui->Player4->setTitle(names[4]);
-        ui->rdy_2->setStyleSheet(names[6] == "1" ? "background-color: green" : "background-color: orange");
-        ui->rdy_3->setStyleSheet(names[7] == "1" ? "background-color: green" : "background-color: orange");
-        ui->rdy_4->setStyleSheet(names[8] == "1" ? "background-color: green" : "background-color: orange");
+        //names.removeOne(this->nickname);                      // for being first on list
+        ui->Player1->setTitle(names[2]);
+        ui->Player2->setTitle(names[3]);
+        ui->Player3->setTitle(names[4]);
+        ui->Player4->setTitle(names[5]);
+        ui->rdy_1->setStyleSheet(names[6] == "1" ? "background-color: green" : "background-color: orange");
+        ui->rdy_2->setStyleSheet(names[7] == "1" ? "background-color: green" : "background-color: orange");
+        ui->rdy_3->setStyleSheet(names[8] == "1" ? "background-color: green" : "background-color: orange");
+        ui->rdy_4->setStyleSheet(names[9] == "1" ? "background-color: green" : "background-color: orange");
     }
 }
 
@@ -93,7 +93,7 @@ void Game::setNicksOnTheRight()
 */
 void Game::setDataOnTheRight()
 {
-    if (this->dataList[1] == "game" && legal())
+    if (legal() && this->dataList[1] == "game")
     {
         int i = 3;
         ui->HP_1->setText(this->dataListStats[i]);
@@ -140,9 +140,10 @@ void Game::setDataOnTheRight()
 }
 
 
-QString* openMap()
+QString* Game::openMap()
 {
-    QFile file = QFile("/home/helena/Projekt/skproject/map1.txt");
+    ui->console->setText(this->mapNumber);
+    QFile file = QFile("/home/helena/Projekt/skproject/map" + this->mapNumber + ".txt");
     if(!file.exists())                  { qCritical() << "File not found";   }
     if(!file.open(QIODevice::ReadOnly)) { qCritical() << file.errorString(); }
     QTextStream stream(&file);
@@ -225,6 +226,27 @@ void Game::paintEvent(QPaintEvent *event)
 //    if (QMessageBox::Yes == QMessageBox::question(this, "Exit?", "You will lose if you exit!", QMessageBox::Yes | QMessageBox::No))
 //    { this->exit = true; event->accept(); }
 //    else { this->exit = false; } }
+
+
+void Game::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Up)
+    {
+        emit keyboardUp();
+    }
+    if(event->key() == Qt::Key_Down)
+    {
+        emit keyboardDown();
+    }
+    if(event->key() == Qt::Key_Left)
+    {
+        emit keyboardLeft();
+    }
+    if(event->key() == Qt::Key_Right)
+    {
+        emit keyboardRight();
+    }
+}
 
 void Game::on_readyBtn_clicked()
 {

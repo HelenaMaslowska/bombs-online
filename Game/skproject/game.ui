@@ -120,6 +120,9 @@
        </layout>
       </widget>
       <widget class="QPushButton" name="rdy_1">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -225,6 +228,9 @@
        </layout>
       </widget>
       <widget class="QPushButton" name="rdy_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -330,6 +336,9 @@
        </layout>
       </widget>
       <widget class="QPushButton" name="rdy_3">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -441,6 +450,9 @@
        </layout>
       </widget>
       <widget class="QPushButton" name="rdy_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>140</x>
@@ -535,6 +547,9 @@
      <width>311</width>
      <height>101</height>
     </rect>
+   </property>
+   <property name="textInteractionFlags">
+    <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
    </property>
   </widget>
  </widget>

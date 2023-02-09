@@ -4,7 +4,6 @@
 Game::Game(QWidget *parent) : QFrame(parent), ui(new Ui::Game)
 {
     ui->setupUi(this);
-    ui->rdy_1->setStyleSheet("background-color: orange");
     ui->readyColor->setStyleSheet("background-color: orange");
 }
 Game::~Game(){ delete ui; }
@@ -138,7 +137,24 @@ void Game::setDataOnTheRight()
         }
     }
 }
+void Game::enableReadyBtn()
+{
+    ui->readyBtn->setText("Not ready");
+    ui->readyColor->setStyleSheet("background-color: orange");
+    this->ui->readyBtn->setEnabled(true);
+}
 
+void Game::disableReadyBtn()
+{
+    ui->readyBtn->setText("Ready");
+    ui->readyColor->setStyleSheet("background-color: green");
+    this->ui->readyBtn->setEnabled(false);
+}
+
+void Game::setGreens()
+{
+    ui->readyColor->setStyleSheet("background-color: green");
+}
 
 QString* Game::openMap()
 {
@@ -230,21 +246,30 @@ void Game::paintEvent(QPaintEvent *event)
 
 void Game::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Up)
+    if(event->key() == Qt::Key_W)
     {
+        //this->move = "u";
         emit keyboardUp();
     }
-    if(event->key() == Qt::Key_Down)
+    if(event->key() == Qt::Key_S)
     {
+        //this->move = "d";
         emit keyboardDown();
     }
-    if(event->key() == Qt::Key_Left)
+    if(event->key() == Qt::Key_A)
     {
+        //this->move = "l";
         emit keyboardLeft();
     }
-    if(event->key() == Qt::Key_Right)
+    if(event->key() == Qt::Key_D)
     {
+        //this->move = "r";
         emit keyboardRight();
+    }
+    if(event->key() == Qt::Key_X)
+    {
+        //this->move = "b";
+        emit keyboardBomb();
     }
 }
 
@@ -255,15 +280,12 @@ void Game::on_readyBtn_clicked()
         this->ready = true;
         ui->readyBtn->setText("Ready");
         ui->readyColor->setStyleSheet("background-color: green");
-        ui->rdy_1->setStyleSheet("background-color: green");
     }
     else
     {
         this->ready = false;
-
         ui->readyBtn->setText("Not ready");
         ui->readyColor->setStyleSheet("background-color: orange");
-        ui->rdy_1->setStyleSheet("background-color: orange");
     }
 }
 
@@ -271,4 +293,5 @@ void Game::on_exitBtn_clicked()
 {
     this->exit = true;
     this->close();
+    emit quitGameUI();
 }

@@ -7,13 +7,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     game = new Game();
     TCPSocket = new QTcpSocket();
     TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);
-    connect(TCPSocket,SIGNAL(readyRead()), this, SLOT(read_data_from_server()));
-    connect(game, SIGNAL(keyboardUp()), this, SLOT(read_data_from_server()));
-    connect(game, SIGNAL(keyboardDown()), this, SLOT(keyPressedDown()));
-    connect(game, SIGNAL(keyboardLeft()), this, SLOT(keyPressedLeft()));
-    connect(game, SIGNAL(keyboardRight()), this, SLOT(keyPressedRight()));
-
-    //connect(TCPSocket, SIGNAL(bytesWritten(qint64)),this->game, SLOT(send_data_to_server())); //doesnt work
+    connect(TCPSocket,SIGNAL(readyRead()),  this, SLOT(read_data_from_server()));
+    connect(game, SIGNAL(keyboardUp()),     this, SLOT(up()));
+    connect(game, SIGNAL(keyboardDown()),   this, SLOT(down()));
+    connect(game, SIGNAL(keyboardLeft()),   this, SLOT(left()));
+    connect(game, SIGNAL(keyboardRight()),  this, SLOT(right()));
+    connect(game, SIGNAL(keyboardBomb()),   this, SLOT(bomb()));
+    connect(game, SIGNAL(quitGameUI()),     this, SLOT(backToStart()));
     TCPSocket->open(QIODevice::ReadWrite);
 //    if (TCPSocket->isOpen()) { QMessageBox::information(this, "Hej! Miłego kodowania!", "Połączyłaś się ez"); }
 }
@@ -22,6 +22,18 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
+void MainWindow::up()       { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;u;?"); }
+void MainWindow::down()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;d;?"); }
+void MainWindow::left()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;l;?"); }
+void MainWindow::right()    { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;r;?"); }
+void MainWindow::bomb()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;b;?"); }
+
+void MainWindow::backToStart()
+{
+    this->ui->nickInput->setText("");
+    this->show();
+    this->status = 1;
+}
 /*
  * When you click startBtn then MainWindow send nickname to the server.
  * Example: nick;Nick name;       -  "nick": prefix, "Nick name": player's input, ";": separator
@@ -29,20 +41,27 @@ MainWindow::~MainWindow() {
  */
 void MainWindow::on_startBtn_clicked() // send nickname to the server
 {
-    //if ()
-    if (TCPSocket && TCPSocket->isOpen())
+    if(ui->nickInput->text() == "")
     {
-        QString prefix = "nick;";
-        QString nick = (ui->nickInput->text());
-        if(nick.size() > 15) nick = nick.sliced(0,15);
-        QString sendMessage = prefix + nick + ";";
-        TCPSocket->write(sendMessage.toStdString().c_str());
-        game->setNickname(nick);
-        game->show();
-        //this->hide();
-        this->status = 2;
+        QMessageBox::information(this, "So you are noname?", "Type your special nickname!");
     }
-    else { QMessageBox::information(this, "Hej! Miłego debugowania!", TCPSocket->errorString()); }
+    else
+    {
+        if (TCPSocket && TCPSocket->isOpen())
+        {
+            QString prefix = "!;nick;";
+            QString nick = ui->nickInput->text();
+            if(nick.size() > 15) nick = nick.sliced(0,15);
+            QString sendMessage = prefix + nick + ";?";
+            TCPSocket->write(sendMessage.toStdString().c_str());
+            game->setNickname(nick);
+            game->enableReadyBtn();
+            game->show();
+            this->hide();
+            this->status = 2;
+        }
+        else { QMessageBox::information(this, "Hej! Miłego debugowania!", TCPSocket->errorString()); }
+    }
 }
 
 /*
@@ -52,14 +71,6 @@ void MainWindow::on_exitBtn_clicked()
 {
     this->close();
 }
-
-//void MainWindow::keyPressedUp()
-//{
-//    if (TCPSocket && TCPSocket->isOpen())
-//    {
-//        TCPSocket->write("!;up;?");
-//    }
-//}
 
 /*
  * Read and send data from server at once.
@@ -85,7 +96,7 @@ void MainWindow::read_data_from_server()
             }
             game->serverData(MessageString);
             //game->setNicksOnTheRight(MessageString);
-            MessageString = "";
+
 
             if(game->exit)
             {
@@ -95,74 +106,57 @@ void MainWindow::read_data_from_server()
 
             if (this->status == 2)
             {
-                if (game->ready)
+                if(MessageString == "!;allrdy;?")
                 {
-                    QString sendMessage = "!;rdy;1;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
+                    this->status = 3;
+                    TCPSocket->write("!;go;s;?");
+                    game->disableReadyBtn();
+                    game->setGreens();
                 }
-                else if(!game->ready)
+                else
                 {
-                    QString sendMessage = "!;rdy;0;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
-                }
-            }
-            if(this->status == 3)
-            {
-                if(game->move == "u")
-                {
-                    QString sendMessage = "!;go;u;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
-                }
-                if(game->move == "d")
-                {
-                    QString sendMessage = "!;go;d;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
-                }
-                if(game->move == "l")
-                {
-                    QString sendMessage = "!;go;l;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
-                }
-                if(game->move == "r")
-                {
-                    QString sendMessage = "!;go;r;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
-                }
-                if(game->move == "b")
-                {
-                    QString sendMessage = "!;go;b;?";
-                    TCPSocket->write(sendMessage.toStdString().c_str());
+                    if (game->ready)
+                    {
+                        QString sendMessage = "!;rdy;1;?";
+                        TCPSocket->write(sendMessage.toStdString().c_str());
+                    }
+                    else if(!game->ready)
+                    {
+                        QString sendMessage = "!;rdy;0;?";
+                        TCPSocket->write(sendMessage.toStdString().c_str());
+                    }
                 }
             }
+            MessageString = "";
         }
     }
 }
 
-void MainWindow::send_data_to_server()
-{
-    QString tru;
-    //if (game->)
-    {
-        if(game->exit)
-        {
-            TCPSocket->write("!;exit;?");
-            game->exit == false;
-        }
-        if (game->ready)
-        {
-            QString sendMessage = "!;rdy;1;?";
-            TCPSocket->write(sendMessage.toStdString().c_str());
-        }
-        if(game->ready)
+//void MainWindow::send_data_to_server()
+//{
+//    QString tru;
+//    //if (game->)
+//    {
+//        if(game->exit)
+//        {
+//            TCPSocket->write("!;exit;?");
+//            game->exit == false;
+//        }
+//        if (game->ready)
+//        {
+//            QString sendMessage = "!;rdy;1;?";
+//            TCPSocket->write(sendMessage.toStdString().c_str());
+//        }
+//        if(game->ready)
 
-        TCPSocket->write((game->ready == 1 ? "ready" : "not ready"));
-        if (!game->ready)
-        {
-            QString sendMessage = "!;rdy;0;?";
-            TCPSocket->write(sendMessage.toStdString().c_str());
-        }
-    }
-}
+//        TCPSocket->write((game->ready == 1 ? "ready" : "not ready"));
+//        if (!game->ready)
+//        {
+//            QString sendMessage = "!;rdy;0;?";
+//            TCPSocket->write(sendMessage.toStdString().c_str());
+//        }
+//    }
+//}
 
 
 

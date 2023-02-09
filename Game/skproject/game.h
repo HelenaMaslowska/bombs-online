@@ -39,6 +39,9 @@ public:
     void updateDataFromServer(QString serverData);
     void serverData(QString inputData);
     bool legal();
+    void enableReadyBtn();
+    void disableReadyBtn();
+    void setGreens();
     QString* openMap();
     virtual void paintEvent(QPaintEvent *event);
     //void closeEvent(QCloseEvent *event);
@@ -55,6 +58,8 @@ signals:
     void keyboardDown();
     void keyboardLeft();
     void keyboardRight();
+    void keyboardBomb();
+    void quitGameUI();
 
 public:
     Ui::Game *ui;
@@ -63,7 +68,7 @@ public:
 public:
     bool ready = 0;
     bool exit = 0;
-    QString move = "d";
+    //QString move = "";
     QString data;
     QStringList dataList;
     QStringList dataListBricks;

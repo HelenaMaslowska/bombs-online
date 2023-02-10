@@ -9,6 +9,7 @@
 #include <QString>
 #include <QFile>
 #include <QKeyEvent>
+#include <QDir>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -54,6 +55,8 @@ public slots:
     void on_exitBtn_clicked();
 
 signals:
+    void readyNo();
+    void readyYes();
     void keyboardUp();
     void keyboardDown();
     void keyboardLeft();

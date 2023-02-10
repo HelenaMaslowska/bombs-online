@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     TCPSocket = new QTcpSocket();
     TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);
     connect(TCPSocket,SIGNAL(readyRead()),  this, SLOT(read_data_from_server()));
+    connect(game, SIGNAL(readyYes()),       this, SLOT(rdyYes()));
+    connect(game, SIGNAL(readyNo()),        this, SLOT(rdyNo()));
     connect(game, SIGNAL(keyboardUp()),     this, SLOT(up()));
     connect(game, SIGNAL(keyboardDown()),   this, SLOT(down()));
     connect(game, SIGNAL(keyboardLeft()),   this, SLOT(left()));
@@ -21,7 +23,8 @@ MainWindow::~MainWindow() {
     if(TCPSocket) TCPSocket->close();
     delete ui;
 }
-
+void MainWindow::rdyYes()   { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;rdy;1;?"); }
+void MainWindow::rdyNo()    { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;rdy;0;?"); }
 void MainWindow::up()       { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;u;?"); }
 void MainWindow::down()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;d;?"); }
 void MainWindow::left()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;l;?"); }
@@ -112,19 +115,6 @@ void MainWindow::read_data_from_server()
                     TCPSocket->write("!;go;s;?");
                     game->disableReadyBtn();
                     game->setGreens();
-                }
-                else
-                {
-                    if (game->ready)
-                    {
-                        QString sendMessage = "!;rdy;1;?";
-                        TCPSocket->write(sendMessage.toStdString().c_str());
-                    }
-                    else if(!game->ready)
-                    {
-                        QString sendMessage = "!;rdy;0;?";
-                        TCPSocket->write(sendMessage.toStdString().c_str());
-                    }
                 }
             }
             MessageString = "";

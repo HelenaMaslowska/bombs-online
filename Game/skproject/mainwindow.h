@@ -29,6 +29,8 @@ private slots:
     void on_startBtn_clicked();
     void on_exitBtn_clicked();
     void read_data_from_server();
+    void rdyYes();
+    void rdyNo();
     void up();
     void down();
     void left();

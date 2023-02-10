@@ -1,6 +1,76 @@
 #include "game.h"
 #include "ui_game.h"
 
+QString googleMaps[4][15] = {
+    {
+        "111111111111111",
+        "100221000122001",
+        "101122202221101",
+        "122012101210221",
+        "120110101011021",
+        "121002212200121",
+        "121211010112121",
+        "100210202012001",
+        "121211010112121",
+        "121002212200121",
+        "120110101011021",
+        "122012101210221",
+        "101122202221101",
+        "100221000122001",
+        "111111111111111"
+    },
+    {
+        "111111111111111",
+        "100222212222001",
+        "101111000111101",
+        "121002212200121",
+        "121021111120121",
+        "101002020200101",
+        "102210101012201",
+        "110112020211011",
+        "102210101012201",
+        "101002020200101",
+        "121021111120121",
+        "121002212200121",
+        "101111000111101",
+        "100222212222001",
+        "111111111111111"
+    },
+    {
+        "111111111111111",
+        "100202020202001",
+        "101010111010101",
+        "121202212200121",
+        "101101111101101",
+        "121200212002121",
+        "101011000110101",
+        "120202020202021",
+        "101011000110101",
+        "121200212002121",
+        "101101111101101",
+        "121002212200121",
+        "101010111010101",
+        "100202020202001",
+        "111111111111111"
+    },
+    {
+        "111111111111111",
+        "100202020202001",
+        "101010111010101",
+        "121202212200121",
+        "101101111101101",
+        "121200212002121",
+        "101011000110101",
+        "120202020202021",
+        "101011000110101",
+        "121200212002121",
+        "101101111101101",
+        "121002212200121",
+        "101010111010101",
+        "100202020202001",
+        "111111111111111"
+    }
+};
 Game::Game(QWidget *parent) : QFrame(parent), ui(new Ui::Game)
 {
     ui->setupUi(this);
@@ -156,24 +226,31 @@ void Game::setGreens()
     ui->readyColor->setStyleSheet("background-color: green");
 }
 
+//QString* Game::openMap()        // też działa ale ma ścieżkę absolutną
+//{
+//    QDir dir("../map" + this->mapNumber + ".txt"); //debug ma gdzie indziej więc nawet z QDir nie wyciągniesz ścieżki xd
+//    ui->console->setText(dir.currentPath());
+
+//    QFile file("/home/helena/Projekt/skproject/map" + this->mapNumber + ".txt");
+//    if(!file.exists())                  { qCritical() << "File not found";   }
+//    if(!file.open(QIODevice::ReadOnly)) { qCritical() << file.errorString(); }
+//    QTextStream stream(&file);
+//    // qInfo() << file.readAll();
+//    QString* arr = new QString[15];
+//    int i = 0;
+//    while (!stream.atEnd())
+//    {
+//        QString line = stream.readLine();
+//        arr[i] = line;
+//        ++i;
+//    }
+//    file.close();
+//    return arr;
+//}
+
 QString* Game::openMap()
 {
-    ui->console->setText(this->mapNumber);
-    QFile file = QFile("/home/helena/Projekt/skproject/map" + this->mapNumber + ".txt");
-    if(!file.exists())                  { qCritical() << "File not found";   }
-    if(!file.open(QIODevice::ReadOnly)) { qCritical() << file.errorString(); }
-    QTextStream stream(&file);
-    // qInfo() << file.readAll();
-    QString* arr = new QString[15];
-    int i = 0;
-    while (!stream.atEnd())
-    {
-        QString line = stream.readLine();
-        arr[i] = line;
-        ++i;
-    }
-    file.close();
-    return arr;
+    return googleMaps[this->mapNumber.toInt()-1];
 }
 
 void Game::paintEvent(QPaintEvent *event)
@@ -280,12 +357,14 @@ void Game::on_readyBtn_clicked()
         this->ready = true;
         ui->readyBtn->setText("Ready");
         ui->readyColor->setStyleSheet("background-color: green");
+        emit readyYes();
     }
     else
     {
         this->ready = false;
         ui->readyBtn->setText("Not ready");
         ui->readyColor->setStyleSheet("background-color: orange");
+        emit readyNo();
     }
 }
 

@@ -17,6 +17,7 @@
 #include <vector>
 #include <semaphore.h>
 #include <pthread.h>
+#include <ctime> 
 using namespace std;
 //Server side
 /*
@@ -33,7 +34,7 @@ string map_files[8] = {"Maps/map1.txt","Maps/map2.txt","Maps/map3.txt","Maps/map
 struct Player{
 	float x,y;
 	//u - up, d - down, ... , b - bomb
-	char nextMove=' ';
+	char next_move=' ';
 	char looking='d';
 	int hp=3;
 	int bombStr=1;
@@ -83,38 +84,38 @@ struct Game{
 	}
 
 
-	void playerInput(int index, char input)
+	void player_input(int index, char input)
 	{
-	    gracze[index].nextMove=input;
+	    gracze[index].next_move=input;
 	}
 
-	void dodajGracza()
+	void add_player()
 	{
 		if(ileGraczy>=4)
 		{
 			return;
 		}
-		Player pom;
+		Player temp_player;
 		switch(ileGraczy)
         {
         case 0:
-            gracze[ileGraczy].x=1;
-            gracze[ileGraczy].y=1;
+            temp_player.x=1;
+            temp_player.y=1;
             break;
         case 1:
-            gracze[ileGraczy].x=n-1;
-            gracze[ileGraczy].y=1;
+            temp_player.x=n-2;
+            temp_player.y=1;
             break;
         case 2:
-            gracze[ileGraczy].x=1;
-            gracze[ileGraczy].y=n-1;
+            temp_player.x=1;
+            temp_player.y=n-2;
             break;
         case 3:
-            gracze[ileGraczy].x=n-1;
-            gracze[ileGraczy].y=n-1;
+            temp_player.x=n-2;
+            temp_player.y=n-2;
             break;
         }
-		gracze.push_back(pom);
+		gracze.push_back(temp_player);
 		ileGraczy++;
 	}
 	void damagePlayer(int i, int damage)
@@ -150,7 +151,7 @@ struct Game{
 				modX-=1;
 				x+=1;
 			}
-			switch(gracze[i].nextMove)
+			switch(gracze[i].next_move)
 			{
 				case 'l':
 					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modY <= 0)){
@@ -230,7 +231,7 @@ struct Game{
 					break;
 			}
 			if(gracze[i].invulnerable>0)gracze[i].invulnerable-=1;
-			gracze[i].nextMove=' ';
+			gracze[i].next_move=' ';
 		}
 		//bomb ticks
 		for(int i=0;i<bomby.size();i++)
@@ -366,7 +367,7 @@ struct Game{
 				}
 			}
 		}
-		send = to_string(ile)+";"+send;
+		send = ";"+to_string(ile)+";"+send;
 		string undetonated = "";
 		string detonated = "";
 		int und=0;
@@ -410,13 +411,15 @@ struct Game{
 struct Client{
 	int sd=0;
 	string nickname;
-	int room;
+	int room=-1;
 };
 
 struct Room{
-	vector<Client> clients;
+	vector<int> clients;
 	vector<bool> ready;
 	Game game;
+	int map;
+	bool all_ready=false;
 };
 
 bool close_server=false;
@@ -424,6 +427,7 @@ int serverSd;
 fd_set readfds;
 int max_sd;
 vector<Client> clients;
+vector<Room> rooms;
 int clients_size=0;
 sockaddr_in newSockAddr;
 socklen_t newSockAddrSize = sizeof(newSockAddr);
@@ -438,9 +442,57 @@ void terminal_inputs()
 			close_server=true;
 			continue;
 		}
+		if(input=="clients"){
+			for(int i=0;i<clients_size;i++)
+			{
+				cout<<"sd: "<<clients[i].sd<<", nickname: "<<clients[i].nickname<<", room: "<<clients[i].room<<"\n";
+			}
+			continue;
+		}
 		cout<<"invalid input\n";
 	}
 	return;
+}
+
+void send_message(int sd, string message){
+	char msg[1500];
+	memset(&msg, 0, sizeof(msg)); //clear the buffer
+	message = "!" + message + "?";
+	strcpy(msg, message.c_str());
+	int send_size = send(sd, (char*)&msg, strlen(msg), 0);
+	if(send_size != strlen(msg))
+	{
+		cout<<"error sendaing message '" + message + "'\n";
+	}
+}
+
+void send_room_info(int room_id)
+{
+	Room room=rooms[room_id];
+	string response=";nicks;";
+	for(int i=0;i<4;i++)
+	{
+		if(room.clients.size()>i)
+		{
+			response+=clients[room.clients[i]].nickname;
+		}
+		response+=";";
+	}
+	for(int i=0;i<4;i++)
+	{
+		if(room.clients.size()>i)
+		{
+			response+=to_string(room.ready[i]);
+		}else
+		{
+			response+="0";
+		}
+		response+=";";
+	}
+	for(int i=0;i<room.clients.size();i++)
+	{
+		send_message(clients[room.clients[i]].sd,response);
+	}
 }
 
 
@@ -485,20 +537,10 @@ void *client_inputs(void *arg)
                 perror("accept");  
                 exit(EXIT_FAILURE);  
             }  
-             
+             int option=1;
+    		setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
             //inform user of socket number - used in send and receive commands 
             printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , sd , inet_ntoa(newSockAddr.sin_addr) , ntohs(newSockAddr.sin_port));  
-           
-            //send new connection greeting message 
-            string message = "Hello\n";
-            memset(&msg, 0, sizeof(msg)); //clear the buffer
-            strcpy(msg, message.c_str());
-            if( send(sd, (char*)&msg, strlen(msg), 0) != strlen(msg) )  
-            {  
-                perror("send");  
-            }  
-                 
-            puts("Welcome message sent successfully");  
                  
             //add new socket to array of sockets 
             bool available=false;
@@ -545,13 +587,131 @@ void *client_inputs(void *arg)
                 }  
                 else 
                 {   
-                    cout << "Client: " << msg << endl << ">";
-                    memset(&msg, 0, sizeof(msg)); //clear the buffer
-                    string message;
-        		getline(cin, message);
-        		message+="\n";
-        		strcpy(msg, message.c_str());
-                    send(sd, (char*)&msg, strlen(msg), 0);
+                	string message = msg;
+                	vector<string> parsed_message;
+                	int parsed_size=0;
+                	string temp="";
+                	for(int j=0;j<message.size();j++)
+                	{
+                		if(message[j]==';')
+                		{
+                			parsed_message.push_back(temp);
+                			temp="";
+                			parsed_size+=1;
+                		}else
+                		{
+                			temp+=message[j];
+                		}
+                	}
+                	temp=temp[0];
+                	parsed_message.push_back(temp);
+                	parsed_size+=1;
+                	for(int j=0;j<parsed_size;j++)
+                	{
+                		cout<<parsed_message[j]+" ";
+                	}
+                	cout<<"\n";
+                	if(parsed_message[0]=="!" && (parsed_message[parsed_size-1]=="?" || parsed_message[parsed_size-1]=="?\n" ))
+                	{
+                		bool handled=false;
+                		if(parsed_message[1]=="nick")
+                		{
+                			if(parsed_size !=4)
+                			{
+                				cout<<"Invalid nick command length";
+                			}else
+                			{
+                				clients[i].nickname=parsed_message[2];
+                				bool empty_room=false;
+                				for(int j=0;j<rooms.size();j++)
+                				{
+                					if(rooms[j].clients.size()<4)
+                					{
+                						if(rooms[j].all_ready==false)
+                						{
+                							empty_room=true;
+                							clients[i].room=j;
+                							rooms[j].clients.push_back(i);
+                							rooms[j].ready.push_back(0);
+                						}
+                					}
+                				}
+                				if(!empty_room)
+                				{
+                					Room temp_room;
+                					Game temp_game;
+                					temp_room.game=temp_game;
+                					temp_room.map=(rand()%8);
+                					temp_room.game.init(temp_room.map);
+                					temp_room.clients.push_back(i);
+                					temp_room.ready.push_back(0);
+                					rooms.push_back(temp_room);
+                					clients[i].room=rooms.size()-1;
+                				}
+                				send_room_info(clients[i].room);
+                				message=";map;"+to_string(rooms[clients[i].room].map)+";";
+                				send_message(sd,message);
+                				handled=true;
+                			}
+                		}
+                		if(parsed_message[1]=="rdy")
+                		{
+                			if(parsed_size !=4)
+                			{
+                				cout<<"Invalid ready command length";
+                			}else
+                			{
+                				int room_id=clients[i].room;
+                				int ready_id;
+                				for(int j=0;j<rooms[room_id].clients.size();j++)
+                				{
+                					if(rooms[room_id].clients[j]==i)
+                					{
+                						ready_id=j;
+                						break;
+                					}
+                				}
+                				try
+                				{
+                					int state = atoi(parsed_message[2].c_str());
+                					rooms[room_id].ready[ready_id]=state;
+                					send_room_info(clients[i].room);
+                				}catch(const exception& e)
+                				{
+                					cout<<"Ready state is not a number\n";
+                				}
+                				handled=true;
+                			}
+                		}
+                		if(parsed_message[1]=="go")
+                		{
+                			if(parsed_size !=4)
+                			{
+                				cout<<"Invalid player command length";
+                			}else
+                			{
+                				int room_id=clients[i].room;
+                				int player_id;
+                				for(int j=0;j<rooms[room_id].clients.size();j++)
+                				{
+                					if(rooms[room_id].clients[j]==i)
+                					{
+                						player_id=j;
+                						break;
+                					}
+                				}
+                				rooms[room_id].game.player_input(player_id,parsed_message[2][0]);
+                				handled=true;
+                			}
+                		}
+                		if(!handled)
+                		{
+                			cout<<"Recieved invalid command in message\n";
+                		}
+                	}else
+                	{
+                		cout<<"Recieved invalid message\n";
+                	}
                 }  
             }  
         }  
@@ -561,22 +721,31 @@ void *client_inputs(void *arg)
 
 
 void *run_games(void *arg){
-	char msg[1500];
     	while(!close_server)
     	{
-    		sleep(3);
-    		int sd;
-    		for(int i=0;i<clients_size;i++)
+    		for(int i=0;i<rooms.size();i++)
     		{
-    		cout<<i<<"\n";
-    			sd=clients[i].sd;
-    			if(sd>0){
-    				memset(&msg, 0, sizeof(msg)); //clear the buffer
-                    		string message = "hello";
-        			message+="\n";
-        			strcpy(msg, message.c_str());
-                    		send(sd, (char*)&msg, strlen(msg), 0);
-                    }
+    			if(rooms[i].all_ready==false)
+    			{
+    				int sum=0;
+    				for(int j=0;j<rooms[i].ready.size();j++)
+    				{
+    					sum+=rooms[i].ready[j];
+    				}
+    				if(sum==rooms[i].ready.size())
+    				{
+    					rooms[i].all_ready=true;
+    					for(int j=0;j<rooms[i].clients.size();j++)
+    					{
+    						send_message(clients[rooms[i].clients[j]].sd,";allrdy;");
+    						rooms[i].game.add_player();
+    					}
+    				}
+    			}
+    			
+    			if(rooms[i].all_ready==true)
+    			{
+    			}
     		}
     	}
     	return 0;
@@ -604,6 +773,8 @@ int main(int argc, char *argv[])
     //open stream oriented socket with internet address
     //also keep track of the socket descriptor
     serverSd = socket(AF_INET, SOCK_STREAM, 0);
+    int option=1;
+    setsockopt(serverSd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     if(serverSd < 0)
     {
         cerr << "Error establishing the server socket" << endl;
@@ -639,6 +810,7 @@ int main(int argc, char *argv[])
     //also keep track of the amount of data sent as well
     pthread_t thread1;
     pthread_t thread2;
+    srand((unsigned)time(0));
     int create_error = pthread_create(&thread1, NULL, client_inputs, NULL);
     if(!create_error)
     {

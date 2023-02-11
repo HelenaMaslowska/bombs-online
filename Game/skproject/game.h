@@ -73,7 +73,7 @@ public:
     bool exit = 0;
     //QString move = "";
     QString data;
-    QStringList dataList;
+    QStringList dataList;       //splited 1 command
     QStringList dataListBricks;
     QStringList dataListBombs;
     QStringList dataListRangeBombs;

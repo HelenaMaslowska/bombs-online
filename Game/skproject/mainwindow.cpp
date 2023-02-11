@@ -94,10 +94,6 @@ void MainWindow::read_data_from_server()
             //while (DataIn.atEnd() == false) { DataIn >> MessageString; }
 
             ui->nickInput->setText(MessageString);
-            if (MessageString.split(";")[1] == "map")
-            {
-                game->mapNumber = MessageString.split(";")[2];
-            }
             game->serverData(MessageString);
             //game->setNicksOnTheRight(MessageString);
 

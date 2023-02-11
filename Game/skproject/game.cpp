@@ -101,7 +101,7 @@ void Game::setDataList()
             temp_msg+="?";                  //!;rdy;0;?
             this->data = this->data.mid(temp_msg.length());
             this->dataList = temp_msg.split(";");
-            qDebug(this->dataList.join(" ").toLatin1());
+            //qDebug(this->dataList.join(" ").toLatin1());
             break;
         }
         temp_msg+=message[j];
@@ -147,6 +147,13 @@ void Game::updateDataFromServer(QString serverData)
     this->setDataList();
     this->setDataSize();
     this->setDataSublists();
+    qDebug() << this->data;
+    while(this->data.length() > 4 && this->data[this->data.length()-1] == '?')
+    {
+        this->setDataList();
+        this->setDataSize();
+        this->setDataSublists();
+    }
 }
 
 /*
@@ -154,14 +161,14 @@ void Game::updateDataFromServer(QString serverData)
  */
 void Game::serverData(QString serverData)
 {
-    qDebug(this->data.toLatin1());
+    qDebug(serverData.toLatin1() + "   " + this->data.toLatin1());
     //this->ui->console->setText(serverData.split(";").join("a"));
 
     this->updateDataFromServer(serverData);     // NEED TO BE FIRST, SET DATA IN CLASS
     this->setNicksOnTheRight();
     this->setDataOnTheRight();
     this->update();
-    qDebug("modified: " + this->data.toLatin1());
+    //qDebug("modified: " + this->data.toLatin1());
 }
 
 /*
@@ -328,7 +335,6 @@ void Game::paintEvent(QPaintEvent *)
     {
         float x = this->dataListStats[i].toFloat()/100;
         float y = this->dataListStats[i+1].toFloat()/100;
-        qDebug() << x << y;
         //ui->console->setText((this->dataListStats[i+1].toFloat()/100));
         painter.setBrush(Qt::SolidPattern);
         pen.setColor(Qt::red);

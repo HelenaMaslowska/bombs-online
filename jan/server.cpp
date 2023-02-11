@@ -573,7 +573,7 @@ void *client_inputs(void *arg)
             	client.sd=sd;
             	clients.push_back(client);
             	clients_size+=1;
-            	printf("Increasing list of clients and adding to list of clients as %d\n" , clients_size); 
+            	printf("Increasing list of clients and adding to list of clients as %d\n" , clients_size-1); 
             }
         }  
         //else its some IO operation on some other socket
@@ -590,14 +590,22 @@ void *client_inputs(void *arg)
                 if (msg_length== 0)  
                 {  
                 	int room_id=clients[i].room;
-                	for(int j=0;j<rooms[room_id].clients.size();j++)
+                	if(room_id>=0)
                 	{
-                		if(rooms[room_id].clients[j]==i)
+                		for(int j=0;j<rooms[room_id].clients.size();j++)
                 		{
-                			rooms[room_id].clients.erase(rooms[room_id].clients.begin()+j);
-                			rooms[room_id].ready.erase(rooms[room_id].ready.begin()+j);
-                			break;
+                			if(rooms[room_id].clients[j]==i)
+                			{
+                				rooms[room_id].clients.erase(rooms[room_id].clients.begin()+j);
+                				rooms[room_id].ready.erase(rooms[room_id].ready.begin()+j);
+                				if(rooms[room_id].all_ready==true)
+                				{
+                					rooms[room_id].game.remove_player(j);
+                				}
+                				break;
+                			}
                 		}
+                		send_room_info(room_id);
                 	}
                     //Somebody disconnected , get his details and print 
                     getpeername(sd , (sockaddr*) &newSockAddr, &newSockAddrSize);  

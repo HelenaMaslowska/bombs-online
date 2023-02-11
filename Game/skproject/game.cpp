@@ -98,8 +98,8 @@ void Game::setDataList()
         {
             temp_msg+="?";                  //!;rdy;0;?
             this->data.mid(temp_msg.length());
-            qDebug(this->data.toLatin1() + "  " );
             this->dataList = temp_msg.split(";");
+            qDebug(this->dataList.join(" ").toLatin1());
             break;
         }
         temp_msg+=message[j];
@@ -324,15 +324,15 @@ void Game::paintEvent(QPaintEvent *event)
     }
     for(int i=0 ; i+7 < this->dataListStats.size(); i+=8)   // TODO poprawić na większą precyzję bo narazie przyjmuje tylko zaokrąglone do setek
     {
-        float x = round(this->dataListStats[i].toFloat()/100);
-        float y = round(this->dataListStats[i+1].toFloat()/100);
+        float x = this->dataListStats[i].toFloat()/100;
+        float y = this->dataListStats[i+1].toFloat()/100;
+        qDebug() << x << y;
         //ui->console->setText((this->dataListStats[i+1].toFloat()/100));
         painter.setBrush(Qt::SolidPattern);
         pen.setColor(Qt::red);
         painter.setPen(pen);
 
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
-
 
     }
     pen.setColor(Qt::black);

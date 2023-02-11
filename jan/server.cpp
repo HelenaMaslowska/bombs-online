@@ -21,10 +21,7 @@
 #include <time.h>
 #include <chrono>
 using namespace std;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-using std::chrono::seconds;
-using std::chrono::system_clock;
+
 //Server side
 /*
 
@@ -173,14 +170,19 @@ struct Game{
 			if(gracze[i].next_move=="l"){
 					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modY <= 0)){
 					gracze[i].looking="l";
-					if(modX>=-10 && modX <=10 && plansza[x][y-1] ==0)
+					if(modX+0.1f>=-0.001f && modX -0.1f<=0.001f && plansza[x][y-1] ==0)
 					{
 						gracze[i].y-=gracze[i].speed;
+						
 					}else
 					{
-						if(modY>-10)
+						if(modY>-0.1f)
 						{
-							gracze[i].y-=min(modY+10, gracze[i].speed);
+							gracze[i].y-=gracze[i].speed;
+							if(gracze[i].y<float(y)-0.10f)
+							{
+								gracze[i].y=float(y)-0.10f;
+							}
 						}
 					}
 					}
@@ -188,14 +190,18 @@ struct Game{
 			if(gracze[i].next_move=="r"){
 					gracze[i].looking="r";
 					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modY >= 0)){
-					if(modX>=-10 && modX <=10 && plansza[x][y+1] ==0)
+					if(modX+0.1f>=-0.001f && modX -0.1f<=0.001f && plansza[x][y+1] ==0)
 					{
 						gracze[i].y+=gracze[i].speed;
 					}else
 					{
-						if(modY<10)
+						if(modY<0.1f)
 						{
-							gracze[i].y+=min(10-modY, gracze[i].speed);
+							gracze[i].y+=gracze[i].speed;
+							if(gracze[i].y>float(y)+0.10f)
+							{
+								gracze[i].y=float(y)+0.10f;
+							}
 						}
 					}
 					}
@@ -203,14 +209,18 @@ struct Game{
 			if(gracze[i].next_move=="u"){
 					gracze[i].looking="u";
 					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modX <= 0)){
-					if(modY>=-10 && modY <=10 && plansza[x-1][y] ==0)
+					if(modY+0.1f>=-0.001f && modY -0.1f<=0.001f && plansza[x-1][y] ==0)
 					{
 						gracze[i].x-=gracze[i].speed;
 					}else
 					{
-						if(modX>-10)
+						if(modX>-0.1f)
 						{
-							gracze[i].x-=min(modX+10, gracze[i].speed);
+							gracze[i].x-=gracze[i].speed;
+							if(gracze[i].x<float(x)-0.10f)
+							{
+								gracze[i].x=float(x)-0.10f;
+							}
 						}
 					}
 					}
@@ -218,14 +228,19 @@ struct Game{
 			if(gracze[i].next_move=="d"){
 					gracze[i].looking="d";
 					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modX >= 0)){
-					if(modY>=-10 && modY <=10 && plansza[x+1][y] ==0)
+					if(modY+0.1f>=-0.001f && modY -0.1f<=0.001f && plansza[x+1][y] ==0)
 					{
 						gracze[i].x+=gracze[i].speed;
 					}else
 					{
-						if(modX<10)
+						if(modX<0.1f)
 						{
-							gracze[i].x+=min(10-modX, gracze[i].speed);
+							
+							gracze[i].x+=gracze[i].speed;
+							if(gracze[i].x>float(x)+0.10f)
+							{
+								gracze[i].x=float(x)+0.10f;
+							}
 						}
 					}
 					}
@@ -281,8 +296,15 @@ struct Game{
 					}
 				}
 				//destroy tiles and damage players
+				for(int k=0;k<ileGraczy;k++)
+				{
+					if(xg[k] == x && yg[k] == y)
+					{
+						damagePlayer(k,1);
+					}
+				}
 				//y+j
-				for(int j=0;j<=bomby[i].range; j++)
+				for(int j=1;j<=bomby[i].range; j++)
 				{
 					for(int k=0;k<ileGraczy;k++)
 					{
@@ -333,7 +355,7 @@ struct Game{
 					{
 						plansza[x+j][y]=0;
 					}
-					if(plansza[x+1][y]==1)
+					if(plansza[x+j][y]==1)
 					{
 						break;
 					}
@@ -352,7 +374,7 @@ struct Game{
 					{
 						plansza[x-j][y]=0;
 					}
-					if(plansza[x-1][y]==1)
+					if(plansza[x-j][y]==1)
 					{
 						break;
 					}

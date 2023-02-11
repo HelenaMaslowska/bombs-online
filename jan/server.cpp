@@ -19,7 +19,12 @@
 #include <pthread.h>
 #include <ctime> 
 #include <time.h>
+#include <chrono>
 using namespace std;
+using std::chrono::duration_cast;
+using std::chrono::milliseconds;
+using std::chrono::seconds;
+using std::chrono::system_clock;
 //Server side
 /*
 
@@ -437,7 +442,7 @@ fd_set readfds;
 int max_sd;
 vector<Client> clients;
 vector<Room> rooms;
-vector<time_t> game_timers;
+vector<struct timeval> game_timers;
 int clients_size=0;
 sockaddr_in newSockAddr;
 socklen_t newSockAddrSize = sizeof(newSockAddr);
@@ -703,7 +708,10 @@ void *client_inputs(void *arg)
                 					temp_room.ready.push_back(0);
                 					rooms.push_back(temp_room);
                 					clients[i].room=rooms.size()-1;
-                					game_timers.push_back(time(NULL));
+                					//game_timers.push_back(time(NULL));
+                					struct timeval now;
+                					gettimeofday(&now, NULL);
+                					game_timers.push_back(now);
                 				}
                 				send_room_info(clients[i].room);
                 				message=";map;"+to_string(rooms[clients[i].room].map)+";";
@@ -836,7 +844,11 @@ void *run_games(void *arg){
     			
     			if(rooms[i].all_ready==true)
     			{
-    				if((time(NULL)-game_timers[i])*30>=1)
+    				struct timeval now;
+				gettimeofday(&now, NULL);
+				unsigned long long difference = (now.tv_sec*1000 + now.tv_usec/1000) - (game_timers[i].tv_sec*1000 + game_timers[i].tv_usec/1000);
+				//cout<<difference<<"\n";
+    				if(difference >= 1000/30)
     				{
     					rooms[i].game.tick();
     					string game_state=rooms[i].game.drawGame();
@@ -845,7 +857,7 @@ void *run_games(void *arg){
     						int sd=clients[rooms[i].clients[j]].sd;
     						send_message(sd,game_state);	
     					}
-    					game_timers[i]=time(NULL);
+    					game_timers[i]=now;
     				}
     			}
     		}

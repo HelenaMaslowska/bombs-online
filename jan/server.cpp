@@ -28,7 +28,7 @@ g++ server.cpp -o server
 
 */
 
-string map_files[8] = {"Maps/map1.txt","Maps/map2.txt","Maps/map3.txt","Maps/map4.txt","Maps/map5.txt","Maps/map6.txt","Maps/map7.txt","Maps/map8.txt"};
+string map_files[4] = {"Maps/map1.txt","Maps/map2.txt","Maps/map3.txt","Maps/map4.txt"};
      
 
 
@@ -87,8 +87,19 @@ struct Game{
 
 	void player_input(int index, char input)
 	{
-	    gracze[index].next_move=input;
+		if(index<ileGraczy)
+		{
+			gracze[index].next_move=input;
+		}
 	}
+	
+	void remove_player(int index)
+        {
+        	if(index<ileGraczy)
+        	{
+        		gracze.erase(gracze.begin()+index);
+        	}
+        }
 
 	void add_player()
 	{
@@ -153,7 +164,7 @@ struct Game{
 				x+=1;
 			}
 			if(gracze[i].next_move=="l"){
-					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modY <= 0)){
+					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modY <= 0)){
 					gracze[i].looking="l";
 					if(modX>=-10 && modX <=10 && plansza[x][y-1] ==0)
 					{
@@ -169,7 +180,7 @@ struct Game{
 			}
 			if(gracze[i].next_move=="r"){
 					gracze[i].looking="r";
-					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modY >= 0)){
+					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modY >= 0)){
 					if(modX>=-10 && modX <=10 && plansza[x][y+1] ==0)
 					{
 						gracze[i].y+=gracze[i].speed;
@@ -184,7 +195,7 @@ struct Game{
 			}
 			if(gracze[i].next_move=="u"){
 					gracze[i].looking="u";
-					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modX <= 0)){
+					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modX <= 0)){
 					if(modY>=-10 && modY <=10 && plansza[x-1][y] ==0)
 					{
 						gracze[i].x-=gracze[i].speed;
@@ -199,7 +210,7 @@ struct Game{
 			}
 			if(gracze[i].next_move=="d"){
 					gracze[i].looking="d";
-					if(plansza[x][y] != 1 || (plansza[x][y] == 1 && modX >= 0)){
+					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modX >= 0)){
 					if(modY>=-10 && modY <=10 && plansza[x+1][y] ==0)
 					{
 						gracze[i].x+=gracze[i].speed;
@@ -464,7 +475,7 @@ void send_message(int sd, string message){
 		cout<<"error sending message '" + message + "'\n"<<"wanted to send: "<<strlen(msg)<<"\nsent: "<<send_size<<"\n";
 		char buffer[ 256 ];
 		 char * errorMsg = strerror_r( errno, buffer, 256 ); // GNU-specific version, Linux default
-    		printf("Error %s", errorMsg); //return value has to be used since buffer might not be modified
+    		printf("Error %s\n", errorMsg); //return value has to be used since buffer might not be modified
 	}
 }
 
@@ -599,7 +610,7 @@ void *client_inputs(void *arg)
                     clients[i].nickname="";
                     clients[i].room=-1;
                 }  
-                else 
+                else if(msg_length>0)
                 {   
                 	string message = msg;
                 	vector<string> messages;
@@ -677,7 +688,7 @@ void *client_inputs(void *arg)
                 					Room temp_room;
                 					Game temp_game;
                 					temp_room.game=temp_game;
-                					temp_room.map=(rand()%8);
+                					temp_room.map=(rand()%4);
                 					temp_room.game.init(temp_room.map);
                 					temp_room.clients.push_back(i);
                 					temp_room.ready.push_back(0);
@@ -752,7 +763,10 @@ void *client_inputs(void *arg)
                 		cout<<"Recieved invalid message\n";
                 	}
                 	}
-                }  
+                }  else
+                {
+                	cout<<"Error recieving message\n";
+                }
             }  
         }  
         }

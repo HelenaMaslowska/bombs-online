@@ -17,7 +17,7 @@
 #include <vector>
 #include <semaphore.h>
 #include <pthread.h>
-#include <ctime> 
+#include <ctime>
 #include <time.h>
 #include <chrono>
 using namespace std;
@@ -31,7 +31,7 @@ g++ server.cpp -o server
 */
 
 string map_files[4] = {"Maps/map1.txt","Maps/map2.txt","Maps/map3.txt","Maps/map4.txt"};
-     
+
 
 
 struct Player{
@@ -79,7 +79,7 @@ struct Game{
 			plansza[i]=new int[n];
 			for(int j=0;j<n;j++)
 			{
-				
+
 				plansza[i][j]=pom[j]-48;
 				//cout<<plansza[i][j];
 			}
@@ -96,7 +96,7 @@ struct Game{
 			gracze[index].next_move=input;
 		}
 	}
-	
+
 	void remove_player(int index)
         {
         	if(index<ileGraczy)
@@ -173,7 +173,7 @@ struct Game{
 					if(modX+0.1f>=-0.001f && modX -0.1f<=0.001f && plansza[x][y-1] ==0)
 					{
 						gracze[i].y-=gracze[i].speed;
-						
+
 					}else
 					{
 						if(modY>-0.1f)
@@ -235,7 +235,7 @@ struct Game{
 					{
 						if(modX<0.1f)
 						{
-							
+
 							gracze[i].x+=gracze[i].speed;
 							if(gracze[i].x>float(x)+0.10f)
 							{
@@ -389,7 +389,7 @@ struct Game{
 		}
         	return 0;
 	}
-	
+
 	string drawGame()
 	{
 		int ile=0;
@@ -423,6 +423,7 @@ struct Game{
 			}
 		}
 		send+=to_string(und)+";"+undetonated+to_string(det)+";"+detonated;
+		send+="0;";
 		send+=to_string(ileGraczy)+";";
 		for(int i=0;i<ileGraczy;i++)
 		{
@@ -442,7 +443,6 @@ struct Game{
 				send+="0;";
 			}
 		}
-		send+="0;";
 		return send;
 	}
 };
@@ -545,81 +545,81 @@ void *client_inputs(void *arg)
 	char msg[1500];
 	while(!close_server)
 	{
-	FD_ZERO(&readfds);  
-     
-        //add master socket to set 
-        FD_SET(serverSd, &readfds);  
-        int max_sd = serverSd;  
-    	
-    	for (int i = 0 ; i < clients_size ; i++)  
-        {  
-            int sd = clients[i].sd;  
-                 
-            //if valid socket descriptor then add to read list 
-            if(sd > 0)  
-                FD_SET( sd , &readfds);  
-                 
-            //highest file descriptor number, need it for the select function 
-            if(sd > max_sd)  
-                max_sd = sd;  
-        }  
+	FD_ZERO(&readfds);
+
+        //add master socket to set
+        FD_SET(serverSd, &readfds);
+        int max_sd = serverSd;
+
+    	for (int i = 0 ; i < clients_size ; i++)
+        {
+            int sd = clients[i].sd;
+
+            //if valid socket descriptor then add to read list
+            if(sd > 0)
+                FD_SET( sd , &readfds);
+
+            //highest file descriptor number, need it for the select function
+            if(sd > max_sd)
+                max_sd = sd;
+        }
         struct timeval tv;
         tv.tv_usec=0;
         tv.tv_sec=5;
-        int activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);  
-        if ((activity < 0) && (errno!=EINTR))  
-        {  
-            printf("select error");  
-        } 
-        
-        
-    	if (FD_ISSET(serverSd, &readfds))  
-        {  
+        int activity = select( max_sd + 1 , &readfds , NULL , NULL , &tv);
+        if ((activity < 0) && (errno!=EINTR))
+        {
+            printf("select error");
+        }
+
+
+    	if (FD_ISSET(serverSd, &readfds))
+        {
         	int sd = accept(serverSd, (sockaddr*) &newSockAddr, &newSockAddrSize);
-            if (sd<0)  
-            {  
-                perror("accept");  
-                exit(EXIT_FAILURE);  
-            }  
+            if (sd<0)
+            {
+                perror("accept");
+                exit(EXIT_FAILURE);
+            }
              int option=1;
     		setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
-            //inform user of socket number - used in send and receive commands 
-            printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , sd , inet_ntoa(newSockAddr.sin_addr) , ntohs(newSockAddr.sin_port));  
-                 
-            //add new socket to array of sockets 
+            //inform user of socket number - used in send and receive commands
+            printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , sd , inet_ntoa(newSockAddr.sin_addr) , ntohs(newSockAddr.sin_port));
+
+            //add new socket to array of sockets
             bool available=false;
-            for (int i = 0; i < clients_size; i++)  
-            {  
-                //if position is empty 
-                if( clients[i].sd == 0 )  
-                {  
-                    clients[i].sd = sd;  
-                    printf("Adding to list of clients as %d\n" , i);  
+            for (int i = 0; i < clients_size; i++)
+            {
+                //if position is empty
+                if( clients[i].sd == 0 )
+                {
+                    clients[i].sd = sd;
+                    printf("Adding to list of clients as %d\n" , i);
                      available=true;
-                    break;  
-                }  
-            }  
+                    break;
+                }
+            }
             if(available==false){
             	Client client;
             	client.sd=sd;
             	clients.push_back(client);
             	clients_size+=1;
-            	printf("Increasing list of clients and adding to list of clients as %d\n" , clients_size-1); 
+            	printf("Increasing list of clients and adding to list of clients as %d\n" , clients_size-1);
             }
-        }  
+        }
         //else its some IO operation on some other socket
-        for (int i = 0; i < clients_size; i++)  
-        {  
-            int sd = clients[i].sd;  
-                 
-            if (FD_ISSET( sd , &readfds))  
-            {  
-                //Check if it was for closing , and also read the 
-                //incoming message 
+        for (int i = 0; i < clients_size; i++)
+        {
+            int sd = clients[i].sd;
+
+            if (FD_ISSET( sd , &readfds))
+            {
+                //Check if it was for closing , and also read the
+                //incoming message
                 memset(&msg, 0, sizeof(msg));//clear the buffer
                 int msg_length = recv(sd, (char*)&msg, sizeof(msg), 0);
-                if (msg_length== 0)  
-                {  
+                if (msg_length== 0)
+                {
                 	int room_id=clients[i].room;
                 	if(room_id>=0)
                 	{
@@ -638,19 +638,19 @@ void *client_inputs(void *arg)
                 		}
                 		send_room_info(room_id);
                 	}
-                    //Somebody disconnected , get his details and print 
-                    getpeername(sd , (sockaddr*) &newSockAddr, &newSockAddrSize);  
-                    printf("Host disconnected , ip %s , port %d \n" , 
-                          inet_ntoa(newSockAddr.sin_addr) , ntohs(newSockAddr.sin_port));  
-                         
-                    //Close the socket and mark as 0 in list for reuse 
-                    close( sd );  
-                    clients[i].sd = 0;  
+                    //Somebody disconnected , get his details and print
+                    getpeername(sd , (sockaddr*) &newSockAddr, &newSockAddrSize);
+                    printf("Host disconnected , ip %s , port %d \n" ,
+                          inet_ntoa(newSockAddr.sin_addr) , ntohs(newSockAddr.sin_port));
+
+                    //Close the socket and mark as 0 in list for reuse
+                    close( sd );
+                    clients[i].sd = 0;
                     clients[i].nickname="";
                     clients[i].room=-1;
-                }  
+                }
                 else if(msg_length>0)
-                {   
+                {
                 	string message = msg;
                 	vector<string> messages;
                 	string temp_msg="";
@@ -794,7 +794,7 @@ void *client_inputs(void *arg)
                 					}
                 				}
                 				rooms[room_id].game.player_input(player_id,parsed_message[2][0]);
-                			
+
                 			}
                 		}
                 		if(parsed_message[1]=="exit")
@@ -838,8 +838,8 @@ void *client_inputs(void *arg)
                 {
                 	cout<<"Error recieving message\n";
                 }
-            }  
-        }  
+            }
+        }
         }
         return 0;
 }
@@ -867,7 +867,7 @@ void *run_games(void *arg){
     					}
     				}
     			}
-    			
+
     			if(rooms[i].all_ready==true)
     			{
     				struct timeval now;
@@ -881,7 +881,7 @@ void *run_games(void *arg){
     					for(int j=0;j<rooms[i].clients.size();j++)
     					{
     						int sd=clients[rooms[i].clients[j]].sd;
-    						send_message(sd,game_state);	
+    						send_message(sd,game_state);
     					}
     					game_timers[i]=now;
     				}
@@ -902,14 +902,14 @@ int main(int argc, char *argv[])
     //grab the port number
     int port = atoi(argv[1]);
     //buffer to send and receive messages with
-     
+
     //setup a socket and connection tools
     sockaddr_in servAddr;
     bzero((char*)&servAddr, sizeof(servAddr));
     servAddr.sin_family = AF_INET;
     servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     servAddr.sin_port = htons(port);
- 
+
     //open stream oriented socket with internet address
     //also keep track of the socket descriptor
     serverSd = socket(AF_INET, SOCK_STREAM, 0);
@@ -921,7 +921,7 @@ int main(int argc, char *argv[])
         exit(0);
     }
     //bind the socket to its local address
-    int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr, 
+    int bindStatus = bind(serverSd, (struct sockaddr*) &servAddr,
         sizeof(servAddr));
     if(bindStatus < 0)
     {
@@ -933,9 +933,9 @@ int main(int argc, char *argv[])
     listen(serverSd, 5);
     //receive a request from client using accept
     //we need a new address to connect with the client
-    //accept, create a new socket descriptor to 
+    //accept, create a new socket descriptor to
     //handle the new connection with client
-    
+
     /*int newSd = accept(serverSd, (sockaddr *)&newSockAddr, &newSockAddrSize);
     if(newSd < 0)
     {
@@ -958,7 +958,7 @@ int main(int argc, char *argv[])
      	if(!create_error)
      	{
      		terminal_inputs();
-     		
+
      		pthread_join(thread2, NULL); /*wait until the created thread terminates*/
      	}
     	pthread_join(thread1, NULL); /*wait until the created thread terminates*/
@@ -971,8 +971,8 @@ int main(int argc, char *argv[])
     }
     close(serverSd);
     cout << "********Session********" << endl;
-    cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec) 
+    cout << "Elapsed time: " << (end1.tv_sec - start1.tv_sec)
         << " secs" << endl;
     cout << "Connection closed..." << endl;
-    return 0;   
+    return 0;
 }

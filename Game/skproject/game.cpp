@@ -55,19 +55,19 @@ QString googleMaps[4][15] = {
     },
     {
         "111111111111111",
-        "100202020202001",
-        "101010111010101",
-        "121202212200121",
-        "101101111101101",
-        "121200212002121",
-        "101011000110101",
-        "120202020202021",
-        "101011000110101",
-        "121200212002121",
-        "101101111101101",
-        "121002212200121",
-        "101010111010101",
-        "100202020202001",
+        "100121202121001",
+        "121000212000121",
+        "122012111210221",
+        "121100212001121",
+        "100201202102001",
+        "111011101110111",
+        "122002202200221",
+        "111011101110111",
+        "100201202102001",
+        "121100212001121",
+        "122012111210221",
+        "121000212000121",
+        "100121202121001",
         "111111111111111"
     }
 };
@@ -82,7 +82,30 @@ QString Game::getNickname()                 { return this->nickname; }
 void Game::setMap(QString nr)               { this->mapNumber = nr; }
 void Game::setNickname(QString nickname)    { this->nickname = nickname; }
 void Game::setData(QString data)            { this->data = data; }
-void Game::setDataList()                    { this->dataList = this->data.split(";"); }
+
+void Game::setDataList()
+{
+    QString message = this->data;
+    QString temp_msg="";
+    for(int j=0;j<message.length();j++)
+    {
+        if(message[j]=='!')
+        {
+            temp_msg="!";
+            continue;
+        }
+        if(message[j]=='?')
+        {
+            temp_msg+="?";                  //!;rdy;0;?
+            this->data.mid(temp_msg.length());
+            qDebug(this->data.toLatin1() + "  " );
+            this->dataList = temp_msg.split(";");
+            break;
+        }
+        temp_msg+=message[j];
+    }
+}
+
 void Game::setDataSize()                    { this->dataSize = this->dataList.size(); }
 
 void Game::setDataSublists() //dataList: Bombs, Bricks, RangeBombs, Player Stats
@@ -303,11 +326,13 @@ void Game::paintEvent(QPaintEvent *event)
     {
         float x = round(this->dataListStats[i].toFloat()/100);
         float y = round(this->dataListStats[i+1].toFloat()/100);
+        //ui->console->setText((this->dataListStats[i+1].toFloat()/100));
         painter.setBrush(Qt::SolidPattern);
         pen.setColor(Qt::red);
         painter.setPen(pen);
+
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
-        ui->console->setText(QString::fromStdString(std::__cxx11::to_string(y*block_size+margin+block_size/2)));
+
 
     }
     pen.setColor(Qt::black);

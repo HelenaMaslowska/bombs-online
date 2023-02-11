@@ -442,6 +442,7 @@ struct Game{
 				send+="0;";
 			}
 		}
+		send+="0;";
 		return send;
 	}
 };

@@ -333,7 +333,6 @@ void Game::paintEvent(QPaintEvent *event)
         painter.setPen(pen);
 
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
-
     }
     pen.setColor(Qt::black);
 

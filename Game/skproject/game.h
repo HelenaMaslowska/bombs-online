@@ -37,6 +37,7 @@ public:
     void setDataSize();
     void setNicksOnTheRight();
     void setDataOnTheRight();
+    void setConsoleResult();
 
     void updateDataFromServer(QString serverData);
     void serverData(QString inputData);
@@ -79,8 +80,9 @@ public:
     QStringList dataListBombs;      // list of bombs
     QStringList dataListRangeBombs; // list of range bombs
     QStringList dataListStats;      // show them on the right
+    QStringList dataListPowerups;    // every powerup shown in game
     QString mapNumber = "0";        // number of map, 0-3
-    int players;                    // number of players, to show them on the screen
+    int players;                    // number of players, to show them on the screen 1-4
     int playerDataSize = 8;         // size of data that will be use further
     int dataSize = 0;
 };

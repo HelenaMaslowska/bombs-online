@@ -115,33 +115,6 @@ void MainWindow::read_data_from_server()
     }
 }
 
-//void MainWindow::send_data_to_server()
-//{
-//    QString tru;
-//    //if (game->)
-//    {
-//        if(game->exit)
-//        {
-//            TCPSocket->write("!;exit;?");
-//            game->exit == false;
-//        }
-//        if (game->ready)
-//        {
-//            QString sendMessage = "!;rdy;1;?";
-//            TCPSocket->write(sendMessage.toStdString().c_str());
-//        }
-//        if(game->ready)
-
-//        TCPSocket->write((game->ready == 1 ? "ready" : "not ready"));
-//        if (!game->ready)
-//        {
-//            QString sendMessage = "!;rdy;0;?";
-//            TCPSocket->write(sendMessage.toStdString().c_str());
-//        }
-//    }
-//}
-
-
 
 
 

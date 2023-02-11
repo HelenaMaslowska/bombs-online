@@ -540,6 +540,9 @@
    </property>
   </widget>
   <widget class="QTextEdit" name="console">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>250</x>

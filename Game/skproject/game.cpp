@@ -154,11 +154,14 @@ void Game::updateDataFromServer(QString serverData)
  */
 void Game::serverData(QString serverData)
 {
+    qDebug(this->data.toLatin1());
     //this->ui->console->setText(serverData.split(";").join("a"));
+
     this->updateDataFromServer(serverData);     // NEED TO BE FIRST, SET DATA IN CLASS
     this->setNicksOnTheRight();
     this->setDataOnTheRight();
     this->update();
+    qDebug("modified: " + this->data.toLatin1());
 }
 
 /*
@@ -275,6 +278,10 @@ void Game::setGreens()
 
 QString* Game::openMap()
 {
+    if (legal() && this->dataList[1] == "map")
+    {
+        this->mapNumber = this->dataList[2];
+    }
     return googleMaps[this->mapNumber.toInt()];
 }
 
@@ -287,7 +294,6 @@ void Game::paintEvent(QPaintEvent *)
     pen.setWidth(3);
     painter.setPen(pen);
     auto map = openMap();
-//    for(int i =0; i< 15; i++) { std::cout << map[i].toStdString() << std::endl; }
     for (int i=0;i < 15; i++)
     {
         for (int j=0;j < 15; j++)
@@ -343,31 +349,11 @@ void Game::paintEvent(QPaintEvent *)
 
 void Game::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_W)
-    {
-        //this->move = "u";
-        emit keyboardUp();
-    }
-    if(event->key() == Qt::Key_S)
-    {
-        //this->move = "d";
-        emit keyboardDown();
-    }
-    if(event->key() == Qt::Key_A)
-    {
-        //this->move = "l";
-        emit keyboardLeft();
-    }
-    if(event->key() == Qt::Key_D)
-    {
-        //this->move = "r";
-        emit keyboardRight();
-    }
-    if(event->key() == Qt::Key_X)
-    {
-        //this->move = "b";
-        emit keyboardBomb();
-    }
+    if(event->key() == Qt::Key_W) { emit keyboardUp();      }
+    if(event->key() == Qt::Key_S) { emit keyboardDown();    }
+    if(event->key() == Qt::Key_A) { emit keyboardLeft();    }
+    if(event->key() == Qt::Key_D) { emit keyboardRight();   }
+    if(event->key() == Qt::Key_X) { emit keyboardBomb();    }
 }
 
 void Game::on_readyBtn_clicked()

@@ -133,7 +133,7 @@ void Game::setDataList()
     }
 }
 
-void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Player Stats
+void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Powerups, Player Stats
 {
     int bricks, bombs, rangebombs, listStats, powerups, skip = 2;    //2 = game + !
     bricks = this->dataList[skip].toInt() * 2 + 1;                      // 3; 1;1; 1;1; 1;1 = 2*3+1 = 7  sum of these elements
@@ -151,8 +151,7 @@ void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Player Stats
     this->players = players;
     this->dataListStats = this->dataList.sliced(listStats, this->playerDataSize*players); //1 is for skip the number of players
 
-    //ui->console->setText(this->dataListBricks.join(",") + "\n" + this->dataListBombs.join(",")+
-    //                     + "\n" + this->dataListRangeBombs.join(",") + "\n" + this->dataListStats.join(","));
+    //ui->console->setText(this->dataListBricks.join(",") + "\n" + this->dataListBombs.join(","));
 }
 bool Game::legal()
 {
@@ -298,7 +297,7 @@ void Game::paintEvent(QPaintEvent *)
     {
         int x = this->dataListBricks[i].toInt();
         int y = this->dataListBricks[i+1].toInt();
-        map[x][y] = '2';
+
         painter.setBrush(Qt::DiagCrossPattern);
         painter.drawRect(QRect(y*block_size+margin, x*block_size+margin, block_size, block_size));
     }
@@ -319,6 +318,21 @@ void Game::paintEvent(QPaintEvent *)
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
     }
     pen.setColor(Qt::black);
+    for(int i=1 ; i+1< this->dataListPowerups.size(); i+=3)
+    {
+        int x = this->dataListPowerups[i].toInt();
+        int y = this->dataListPowerups[i+1].toInt();
+        int color = this->dataListPowerups[i+2].toInt();
+        if (color == 1) pen.setColor(Qt::green);
+        if (color == 2) pen.setColor(Qt::gray);
+        if (color == 3) pen.setColor(Qt::blue);
+        if (color == 4) pen.setColor(Qt::red);
+        if (color == 5) pen.setColor(Qt::darkYellow);
+        painter.setBrush(Qt::DiagCrossPattern);
+        painter.setPen(pen);
+        painter.drawRect(QRect(y*block_size+margin+block_size/4, x*block_size+margin+block_size/4, block_size/2, block_size/2));
+    }
+    pen.setColor(Qt::black);
     for(int i=1 ; i+1< this->dataListRangeBombs.size(); i+=3)
     {
         int x = this->dataListRangeBombs[i].toInt();
@@ -328,18 +342,16 @@ void Game::paintEvent(QPaintEvent *)
         pen.setColor(Qt::yellow);
         painter.setPen(pen);
         painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2, x*block_size  +margin+block_size/2), block_size/3, block_size/3);
-
         for (int far = -range; far<=range; far++)
         {
-            painter.drawEllipse(QPointF((y+far)*block_size  +margin+block_size/2,
-                                        x*block_size  +margin+block_size/2),
+            painter.drawEllipse(QPointF((y+far)*block_size  +margin+block_size/2, x*block_size  +margin+block_size/2),
                                                     block_size/3, block_size/3);
-            painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2,
-                                        (x+far)*block_size  +margin+block_size/2),
+            painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2, (x+far)*block_size  +margin+block_size/2),
                                                     block_size/3, block_size/3);
         }
     }
     pen.setColor(Qt::black);
+
 }
 
 //void Game::closeEvent(QCloseEvent *event)  // show prompt when user wants to close app {

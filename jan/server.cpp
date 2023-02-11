@@ -763,6 +763,34 @@ void *client_inputs(void *arg)
                 			
                 			}
                 		}
+                		if(parsed_message[1]=="exit")
+                		{
+                			handled=true;
+                			if(parsed_size !=3)
+                			{
+                				cout<<"Invalid exit command length\n";
+                				cout<<message<<"\n";
+                			}else
+                			{
+                				int room_id=clients[i].room;
+                				int player_id;
+                				for(int j=0;j<rooms[room_id].clients.size();j++)
+                				{
+                					if(rooms[room_id].clients[j]==i)
+                					{
+                						rooms[room_id].clients.erase(rooms[room_id].clients.begin()+j);
+                						rooms[room_id].ready.erase(rooms[room_id].ready.begin()+j);
+                						if(rooms[room_id].all_ready==true)
+                						{
+                							rooms[room_id].game.remove_player(j);
+                						}
+                						break;
+                					}
+                				}
+                				clients[i].room=-1;
+                				send_room_info(room_id);
+                			}
+                		}
                 		if(!handled)
                 		{
                 			cout<<"Recieved invalid command in message\n";
@@ -808,7 +836,7 @@ void *run_games(void *arg){
     			
     			if(rooms[i].all_ready==true)
     			{
-    				if((time(NULL)-game_timers[i])*2>=1)
+    				if((time(NULL)-game_timers[i])*30>=1)
     				{
     					rooms[i].game.tick();
     					string game_state=rooms[i].game.drawGame();

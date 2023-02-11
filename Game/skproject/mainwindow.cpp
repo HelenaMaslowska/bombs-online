@@ -34,9 +34,11 @@ void MainWindow::bomb()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->w
 void MainWindow::backToStart()
 {
     this->ui->nickInput->setText("Nickname");
-    this->show();
-    this->status = 1;
     TCPSocket->write("!;exit;?");
+    TCPSocket->close();
+    this->close();
+    //this->show();
+    //this->status = 1;
 }
 /*
  * When you click startBtn then MainWindow send nickname to the server.
@@ -88,15 +90,9 @@ void MainWindow::read_data_from_server()
         if (TCPSocket->isOpen())
         {
             QByteArray data_from_server = TCPSocket->readAll();
-            //QDataStream DataIn(&data_from_server, QIODevice::ReadOnly);
-            //DataIn.setVersion(QDataStream::Version::Qt_5_15);
             QString MessageString = QString::fromStdString(data_from_server.toStdString());
-            //while (DataIn.atEnd() == false) { DataIn >> MessageString; }
-
             ui->nickInput->setText(MessageString);
             game->serverData(MessageString);
-            //game->setNicksOnTheRight(MessageString);
-
 
             if(game->exit)
             {

@@ -265,7 +265,6 @@ void Game::setGreens()
 //{
 //    QDir dir("../map" + this->mapNumber + ".txt"); //debug ma gdzie indziej więc nawet z QDir nie wyciągniesz ścieżki xd
 //    ui->console->setText(dir.currentPath());
-
 //    QFile file("/home/helena/Projekt/skproject/map" + this->mapNumber + ".txt");
 //    if(!file.exists())                  { qCritical() << "File not found";   }
 //    if(!file.open(QIODevice::ReadOnly)) { qCritical() << file.errorString(); }
@@ -299,6 +298,7 @@ void Game::paintEvent(QPaintEvent *)
     QPainter painter(this);
     QPen pen;
     pen.setWidth(3);
+    pen.setColor(Qt::black);
     pen.setCapStyle(Qt::RoundCap);
     painter.setPen(pen);
     auto map = openMap();
@@ -309,19 +309,15 @@ void Game::paintEvent(QPaintEvent *)
             if(map[i].toStdString()[j] == '1')
             {
                 painter.setBrush(Qt::SolidPattern);
-                pen.setColor(Qt::black);
                 painter.drawRect(QRect(j*block_size+margin, i*block_size+margin, block_size, block_size));
             }
-//            if(map[i].toStdString()[j] == '3') {
-//                painter.setBrush(Qt::SolidPattern);
-//                painter.drawEllipse(QPointF(i*(block_size)+margin+block_size/2,j*block_size+margin+block_size/2), block_size/4, block_size/4);
-//            }
         }
     }
-    for(int i=1 ; i+1< this->dataListBricks.size(); i+=2)
+    for(int i=1 ; i+1 < this->dataListBricks.size(); i+=2)
     {
         int x = this->dataListBricks[i].toInt();
         int y = this->dataListBricks[i+1].toInt();
+        map[x][y] = '2';
         painter.setBrush(Qt::DiagCrossPattern);
         painter.drawRect(QRect(y*block_size+margin, x*block_size+margin, block_size, block_size));
     }
@@ -332,28 +328,6 @@ void Game::paintEvent(QPaintEvent *)
         painter.setBrush(Qt::SolidPattern);
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size/4, block_size/4);
     }
-    for(int i=1 ; i+1< this->dataListRangeBombs.size(); i+=3)
-    {
-        int x = this->dataListRangeBombs[i].toInt();
-        int y = this->dataListRangeBombs[i+1].toInt();
-        int range = this->dataListRangeBombs[i+2].toInt();
-        ui->console->setText(QString::number(range));
-        painter.setBrush(Qt::SolidPattern);
-        pen.setColor(Qt::yellow);
-        painter.setPen(pen);
-        //painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size/3, block_size/3);
-        for (int horizontal = -range; horizontal<=range; horizontal++)
-        {
-
-            painter.drawEllipse(QPointF((y+horizontal)*block_size  +margin+block_size/2,
-                                        x*block_size  +margin+block_size/2),
-                                block_size/3, block_size/3);
-            painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2,
-                                        (x+horizontal)*block_size  +margin+block_size/2),
-                                block_size/3, block_size/3);
-        }
-    }
-    pen.setColor(Qt::black);
     for(int i=0 ; i+7 < this->dataListStats.size(); i+=8)
     {
         float x = this->dataListStats[i].toFloat()/100;
@@ -366,6 +340,37 @@ void Game::paintEvent(QPaintEvent *)
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
     }
     pen.setColor(Qt::black);
+    for(int i=1 ; i+1< this->dataListRangeBombs.size(); i+=3)
+    {
+        int x = this->dataListRangeBombs[i].toInt();
+        int y = this->dataListRangeBombs[i+1].toInt();
+        int range = this->dataListRangeBombs[i+2].toInt();
+        ui->console->setText(QString::number(range));
+        painter.setBrush(Qt::SolidPattern);
+        pen.setColor(Qt::yellow);
+        painter.setPen(pen);
+        painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2, x*block_size  +margin+block_size/2), block_size/3, block_size/3);
+        for (int far = -range+1; far<range; far++)
+        {
+            if(far < 0 && -range-far+1 == 0){
+                painter.drawEllipse(QPointF((y+far-1)*block_size  +margin+block_size/2, x*block_size  +margin+block_size/2), block_size/3, block_size/3);
+            }
+            else far = 0;
+            if (far > 0 && range-far-1 == 0) {
+                painter.drawEllipse(QPointF((y+far+1)*block_size  +margin+block_size/2, x*block_size  +margin+block_size/2), block_size/3, block_size/3);
+            }
+            else break;
+
+        }
+        for (int far = -range; far<=range; far++)
+        {
+            painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2,
+                                        (x+far)*block_size  +margin+block_size/2),
+                                block_size/3, block_size/3);
+        }
+    }
+    pen.setColor(Qt::black);
+
 
 }
 

@@ -81,11 +81,12 @@ Game::~Game(){ delete ui; }
 QString Game::getNickname()                 { return this->nickname; }
 void Game::setMap(QString nr)               { this->mapNumber = nr; }
 void Game::setNickname(QString nickname)    { this->nickname = nickname; }
-void Game::setData(QString data)            { this->data = data; }
+void Game::setData(QString data)            { this->data.append(data); }
 void Game::clearDataList()                  { this->dataList.clear(); }
 
 void Game::setDataList()
 {
+    qDebug(this->data.toLatin1());
     QString message = this->data;
     QString temp_msg="";
     for(int j=0;j<message.length();j++)
@@ -98,7 +99,7 @@ void Game::setDataList()
         if(message[j]=='?')
         {
             temp_msg+="?";                  //!;rdy;0;?
-            this->data.mid(temp_msg.length());
+            this->data = this->data.mid(temp_msg.length());
             this->dataList = temp_msg.split(";");
             qDebug(this->dataList.join(" ").toLatin1());
             break;
@@ -109,7 +110,7 @@ void Game::setDataList()
 
 void Game::setDataSize()                    { this->dataSize = this->dataList.size(); }
 
-void Game::setDataSublists() //dataList: Bombs, Bricks, RangeBombs, Player Stats
+void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Player Stats
 {
     if(legal() && this->dataList[1] == "game")
     {
@@ -277,7 +278,7 @@ QString* Game::openMap()
     return googleMaps[this->mapNumber.toInt()];
 }
 
-void Game::paintEvent(QPaintEvent *event)
+void Game::paintEvent(QPaintEvent *)
 {
     int margin = ui->frame->x();
     int block_size = 32;
@@ -295,15 +296,9 @@ void Game::paintEvent(QPaintEvent *event)
             {
                 painter.setBrush(Qt::SolidPattern);
                 pen.setColor(Qt::black);
-                painter.drawRect(QRect(i*block_size+margin, j*block_size+margin, block_size, block_size));
+                painter.drawRect(QRect(j*block_size+margin, i*block_size+margin, block_size, block_size));
             }
-//            if(map[i].toStdString()[j] == '2')
-//            {
-//                painter.setBrush(Qt::DiagCrossPattern);
-//                painter.drawRect(QRect(i*block_size+margin, j*block_size+margin, block_size, block_size));
-//            }
-//            if(map[i].toStdString()[j] == '3')      // bombs damage, change to 2 to see them
-//            {
+//            if(map[i].toStdString()[j] == '3') {
 //                painter.setBrush(Qt::SolidPattern);
 //                painter.drawEllipse(QPointF(i*(block_size)+margin+block_size/2,j*block_size+margin+block_size/2), block_size/4, block_size/4);
 //            }

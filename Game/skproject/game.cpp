@@ -56,7 +56,7 @@ QString googleMaps[4][15] = {
     {
         "111111111111111",
         "100121202121001",
-        "121000212000121",
+        "101000212000101",
         "122012111210221",
         "121100212001121",
         "100201202102001",
@@ -66,7 +66,7 @@ QString googleMaps[4][15] = {
         "100201202102001",
         "121100212001121",
         "122012111210221",
-        "121000212000121",
+        "101000212000101",
         "100121202121001",
         "111111111111111"
     }
@@ -86,7 +86,7 @@ void Game::clearDataList()                  { this->dataList.clear(); }
 
 void Game::setDataList()
 {
-    qDebug(this->data.toLatin1());
+    //qDebug(this->data.toLatin1());
     QString message = this->data;
     QString temp_msg="";
     for(int j=0;j<message.length();j++)
@@ -147,7 +147,7 @@ void Game::updateDataFromServer(QString serverData)
     this->setDataList();
     this->setDataSize();
     this->setDataSublists();
-    qDebug() << this->data;
+    //qDebug() << this->data;
     while(this->data.length() > 4 && this->data[this->data.length()-1] == '?')
     {
         this->setDataList();
@@ -161,7 +161,7 @@ void Game::updateDataFromServer(QString serverData)
  */
 void Game::serverData(QString serverData)
 {
-    qDebug(serverData.toLatin1() + "   " + this->data.toLatin1());
+    //qDebug(serverData.toLatin1() + "   " + this->data.toLatin1());
     //this->ui->console->setText(serverData.split(";").join("a"));
 
     this->updateDataFromServer(serverData);     // NEED TO BE FIRST, SET DATA IN CLASS
@@ -299,6 +299,7 @@ void Game::paintEvent(QPaintEvent *)
     QPainter painter(this);
     QPen pen;
     pen.setWidth(3);
+    pen.setCapStyle(Qt::RoundCap);
     painter.setPen(pen);
     auto map = openMap();
     for (int i=0;i < 15; i++)
@@ -331,7 +332,29 @@ void Game::paintEvent(QPaintEvent *)
         painter.setBrush(Qt::SolidPattern);
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size/4, block_size/4);
     }
-    for(int i=0 ; i+7 < this->dataListStats.size(); i+=8)   // TODO poprawić na większą precyzję bo narazie przyjmuje tylko zaokrąglone do setek
+    for(int i=1 ; i+1< this->dataListRangeBombs.size(); i+=3)
+    {
+        int x = this->dataListRangeBombs[i].toInt();
+        int y = this->dataListRangeBombs[i+1].toInt();
+        int range = this->dataListRangeBombs[i+2].toInt();
+        ui->console->setText(QString::number(range));
+        painter.setBrush(Qt::SolidPattern);
+        pen.setColor(Qt::yellow);
+        painter.setPen(pen);
+        //painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size/3, block_size/3);
+        for (int horizontal = -range; horizontal<=range; horizontal++)
+        {
+
+            painter.drawEllipse(QPointF((y+horizontal)*block_size  +margin+block_size/2,
+                                        x*block_size  +margin+block_size/2),
+                                block_size/3, block_size/3);
+            painter.drawEllipse(QPointF(y*block_size  +margin+block_size/2,
+                                        (x+horizontal)*block_size  +margin+block_size/2),
+                                block_size/3, block_size/3);
+        }
+    }
+    pen.setColor(Qt::black);
+    for(int i=0 ; i+7 < this->dataListStats.size(); i+=8)
     {
         float x = this->dataListStats[i].toFloat()/100;
         float y = this->dataListStats[i+1].toFloat()/100;

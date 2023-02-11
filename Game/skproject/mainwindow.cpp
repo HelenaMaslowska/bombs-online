@@ -33,9 +33,10 @@ void MainWindow::bomb()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->w
 
 void MainWindow::backToStart()
 {
-    this->ui->nickInput->setText("");
+    this->ui->nickInput->setText("Nickname");
     this->show();
     this->status = 1;
+    TCPSocket->write("!;exit;?");
 }
 /*
  * When you click startBtn then MainWindow send nickname to the server.

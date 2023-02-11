@@ -82,6 +82,7 @@ QString Game::getNickname()                 { return this->nickname; }
 void Game::setMap(QString nr)               { this->mapNumber = nr; }
 void Game::setNickname(QString nickname)    { this->nickname = nickname; }
 void Game::setData(QString data)            { this->data = data; }
+void Game::clearDataList()                  { this->dataList.clear(); }
 
 void Game::setDataList()
 {
@@ -273,7 +274,7 @@ void Game::setGreens()
 
 QString* Game::openMap()
 {
-    return googleMaps[this->mapNumber.toInt()-1];
+    return googleMaps[this->mapNumber.toInt()];
 }
 
 void Game::paintEvent(QPaintEvent *event)

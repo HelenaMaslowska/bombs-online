@@ -31,6 +31,8 @@ public:
     void setNickname(QString nickname);
     void setMap(QString nr);
     void setData(QString data);
+    void clearDataList();
+    void clearDataList();
     void setDataList();
     void setDataSublists();
     void setDataSize();
@@ -72,15 +74,15 @@ public:
     bool ready = 0;
     bool exit = 0;
     //QString move = "";
-    QString data;
-    QStringList dataList;       //splited 1 command
-    QStringList dataListBricks;
-    QStringList dataListBombs;
-    QStringList dataListRangeBombs;
-    QStringList dataListStats;
-    QString mapNumber = "1";
-    int players;
-    int playerDataSize = 8;
+    QString data;                   // string of input data
+    QStringList dataList;           // splited 1 command
+    QStringList dataListBricks;     // list of destroyable blocks
+    QStringList dataListBombs;      // list of bombs
+    QStringList dataListRangeBombs; // list of range bombs
+    QStringList dataListStats;      // show them on the right
+    QString mapNumber = "1";        // number of map, 1-4
+    int players;                    // number of players, to show them on the screen
+    int playerDataSize = 8;         // size of data that will be use further
     int dataSize = 0;
 };
 

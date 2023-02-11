@@ -79,12 +79,14 @@ struct Game{
 		for(int i=0;i<n;i++)
 		{
 			plik>>pom;
-			plik>>pom;
 			plansza[i]=new int[n];
 			for(int j=0;j<n;j++)
 			{
-				plansza[i][j]=pom[j];
+				
+				plansza[i][j]=pom[j]-48;
+				//cout<<plansza[i][j];
 			}
+			//cout<<"\n";
 		}
 		plik.close();
 	}
@@ -647,6 +649,7 @@ void *client_inputs(void *arg)
                 	}
                 	for(int k=0;k<messages.size();k++)
                 	{
+                	message=messages[k];
                 	vector<string> parsed_message;
                 	int parsed_size=0;
                 	string temp="";

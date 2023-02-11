@@ -465,6 +465,7 @@ void terminal_inputs()
 }
 
 void send_message(int sd, string message){
+	//cout<<sd<<": "<<message<<"\n";
 	char msg[1500];
 	memset(&msg, 0, sizeof(msg)); //clear the buffer
 	message = "!" + message + "?";
@@ -807,7 +808,7 @@ void *run_games(void *arg){
     			
     			if(rooms[i].all_ready==true)
     			{
-    				if(time(NULL)-game_timers[i]>=float(1/2))
+    				if((time(NULL)-game_timers[i])*2>=1)
     				{
     					rooms[i].game.tick();
     					string game_state=rooms[i].game.drawGame();

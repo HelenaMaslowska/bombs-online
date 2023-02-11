@@ -33,7 +33,8 @@ void MainWindow::bomb()     { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->w
 
 void MainWindow::backToStart()
 {
-    this->ui->nickInput->setText("");
+    this->ui->nickInput->setText("Nickname");
+    TCPSocket->write("!;exit;?");
     this->show();
     this->status = 1;
 }
@@ -98,20 +99,13 @@ void MainWindow::read_data_from_server()
                 game->mapNumber = MessageString.split(";")[2];
             }
             game->serverData(MessageString);
-            //game->setNicksOnTheRight(MessageString);
-
-
-            if(game->exit)
-            {
-                TCPSocket->write("!;exit;?");
-                game->exit == false;
-            }
 
             if (this->status == 2)
             {
                 if(MessageString == "!;allrdy;?")
                 {
                     this->status = 3;
+                    game->exit = false;
                     TCPSocket->write("!;go;s;?");
                     game->disableReadyBtn();
                     game->setGreens();

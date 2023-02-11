@@ -45,7 +45,7 @@
        </property>
        <layout class="QHBoxLayout" name="p1" stretch="6,2">
         <property name="spacing">
-         <number>6</number>
+         <number>2</number>
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -72,14 +72,14 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Max bombs</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Bombs</string>
             </property>
            </widget>
           </item>
@@ -97,21 +97,21 @@
           <item>
            <widget class="QLabel" name="Speed_1">
             <property name="text">
-             <string>0.05</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="MaxBombs_1">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="StrengthBombs_1">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
@@ -153,7 +153,7 @@
        </property>
        <layout class="QHBoxLayout" name="p1_2" stretch="6,2">
         <property name="spacing">
-         <number>6</number>
+         <number>2</number>
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -180,14 +180,14 @@
           <item>
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Max bombs</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_7">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Bombs</string>
             </property>
            </widget>
           </item>
@@ -205,21 +205,21 @@
           <item>
            <widget class="QLabel" name="Speed_2">
             <property name="text">
-             <string>0.05</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="MaxBombs_2">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="StrengthBombs_2">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
@@ -261,7 +261,7 @@
        </property>
        <layout class="QHBoxLayout" name="p1_3" stretch="6,2">
         <property name="spacing">
-         <number>6</number>
+         <number>2</number>
         </property>
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -288,14 +288,14 @@
           <item>
            <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>Max bombs</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_11">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Bombs</string>
             </property>
            </widget>
           </item>
@@ -313,21 +313,21 @@
           <item>
            <widget class="QLabel" name="Speed_3">
             <property name="text">
-             <string>0.05</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="MaxBombs_3">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="StrengthBombs_3">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
@@ -399,14 +399,14 @@
           <item>
            <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>Max bombs</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Bombs</string>
             </property>
            </widget>
           </item>
@@ -427,21 +427,21 @@
           <item>
            <widget class="QLabel" name="Speed_4">
             <property name="text">
-             <string>0.05</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="MaxBombs_4">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="StrengthBombs_4">
             <property name="text">
-             <string>1</string>
+             <string>0</string>
             </property>
            </widget>
           </item>

@@ -95,7 +95,7 @@ struct Game{
 			//cout<<"\n";
 		}
 		plik.close();
-		
+
 	}
 
 
@@ -507,7 +507,7 @@ struct Game{
 					powerups.erase(powerups.begin()+i);
 					i--;
 				}
-			}	
+			}
 		}
 		if(who_won==-1)
 		{
@@ -654,7 +654,7 @@ void terminal_inputs()
 }
 
 void send_message(int sd, string message){
-	cout<<sd<<": "<<message<<"\n";
+	//cout<<sd<<": "<<message<<"\n";
 	char msg[1500];
 	memset(&msg, 0, sizeof(msg)); //clear the buffer
 	message = "!" + message + "?";
@@ -990,7 +990,7 @@ void *client_inputs(void *arg)
                 					clients[i].room=-1;
                 					send_room_info(room_id);
                 				}
-                				
+
                 			}
                 		}
                 		if(!handled)
@@ -1059,7 +1059,7 @@ void *run_games(void *arg){
     						}
     					}
     					game_timers[i]=now;
-    					
+
     				}
     				if(rooms[i].clients.size()==0)
     				{

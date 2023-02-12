@@ -273,6 +273,12 @@ void Game::setGreens()
     ui->rdy_4->setStyleSheet("background-color: green");
 }
 
+void Game::setInformations()
+{
+    ui->console->setText("green -=- range \ngray -=- max bombs \nblue -=- speed \nred -=- HP \n yellow -=- immortality");
+}
+
+
 QString* Game::openMap()
 {
     if (legal() && this->dataList[1] == "map")
@@ -324,7 +330,8 @@ void Game::paintEvent(QPaintEvent *)
         float x = this->dataListStats[i].toFloat()/100;
         float y = this->dataListStats[i+1].toFloat()/100;
         painter.setBrush(Qt::SolidPattern);
-        pen.setColor(Qt::red);
+        if(this->dataListStats[i+7].toInt() == 1) pen.setColor(Qt::yellow);
+        else pen.setColor(Qt::red);
         painter.setPen(pen);
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
     }
@@ -335,10 +342,10 @@ void Game::paintEvent(QPaintEvent *)
         int y = this->dataListPowerups[i+1].toInt();
         int color = this->dataListPowerups[i+2].toInt();
         if (color == 1) pen.setColor(Qt::green);        // range
-        if (color == 2) pen.setColor(Qt::gray);
-        if (color == 3) pen.setColor(Qt::blue);
-        if (color == 4) pen.setColor(Qt::red);
-        if (color == 5) pen.setColor(Qt::darkYellow);
+        if (color == 2) pen.setColor(Qt::gray);         // max bombs
+        if (color == 3) pen.setColor(Qt::blue);         // movement speed
+        if (color == 4) pen.setColor(Qt::red);          // hp
+        if (color == 5) pen.setColor(Qt::yellow);       // immortality
         painter.setBrush(Qt::DiagCrossPattern);
         painter.setPen(pen);
         painter.drawRect(QRect(y*block_size+margin+block_size/4, x*block_size+margin+block_size/4, block_size/2, block_size/2));

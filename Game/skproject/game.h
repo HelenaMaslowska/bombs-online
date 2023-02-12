@@ -45,6 +45,7 @@ public:
     void enableReadyBtn();
     void disableReadyBtn();
     void setGreens();
+    void setInformations();
     QString* openMap();
     virtual void paintEvent(QPaintEvent *);
     //void closeEvent(QCloseEvent *event);

@@ -399,7 +399,7 @@ public:
         exitBtn->setGeometry(QRect(580, 510, 91, 31));
         console = new QTextEdit(Game);
         console->setObjectName("console");
-        console->setEnabled(false);
+        console->setEnabled(true);
         console->setGeometry(QRect(250, 510, 311, 101));
         console->setTextInteractionFlags(Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 

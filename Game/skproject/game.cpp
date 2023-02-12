@@ -133,7 +133,7 @@ void Game::setDataList()
     }
 }
 
-void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Powerups, Player Stats
+void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Powerups, s Stats
 {
     int bricks, bombs, rangebombs, listStats, powerups, skip = 2;    //2 = game + !
     bricks = this->dataList[skip].toInt() * 2 + 1;                      // 3; 1;1; 1;1; 1;1 = 2*3+1 = 7  sum of these elements
@@ -183,17 +183,30 @@ void Game::setNicksOnTheRight()
 void Game::setDataOnTheRight()
 {
     int i = 3;
-    ui->HP_1->setText(this->dataListStats[i]);
-    ui->Speed_1->setText(this->dataListStats[i+1]);
-    ui->MaxBombs_1->setText(this->dataListStats[i+2]);
-    ui->StrengthBombs_1->setText(this->dataListStats[i+3]);
-    i += this->playerDataSize;
+    if (players >= 1)
+    {
+        ui->HP_1->setText(this->dataListStats[i]);
+        ui->Speed_1->setText(this->dataListStats[i+1]);
+        ui->MaxBombs_1->setText(this->dataListStats[i+2]);
+        ui->StrengthBombs_1->setText(this->dataListStats[i+3]);
+        i += this->playerDataSize;
+    }
 
-    ui->HP_2->setText(this->dataListStats[i]);
-    ui->Speed_2->setText(this->dataListStats[i+1]);
-    ui->MaxBombs_2->setText(this->dataListStats[i+2]);
-    ui->StrengthBombs_2->setText(this->dataListStats[i+3]);
-    i += this->playerDataSize;
+    if (players >= 2)
+    {
+        ui->HP_2->setText(this->dataListStats[i]);
+        ui->Speed_2->setText(this->dataListStats[i+1]);
+        ui->MaxBombs_2->setText(this->dataListStats[i+2]);
+        ui->StrengthBombs_2->setText(this->dataListStats[i+3]);
+        i += this->playerDataSize;
+    }
+    else
+    {
+        ui->HP_2->setText("0");
+        ui->Speed_2->setText("0");
+        ui->MaxBombs_2->setText("0");
+        ui->StrengthBombs_2->setText("0");
+    }
     if (players >= 3)
     {
         ui->HP_3->setText(this->dataListStats[i]);
@@ -209,7 +222,7 @@ void Game::setDataOnTheRight()
         ui->MaxBombs_3->setText("0");
         ui->StrengthBombs_3->setText("0");
     }
-    if (players >= 4)
+    if (players == 4)
     {
         ui->HP_4->setText(this->dataListStats[i]);
         ui->Speed_4->setText(this->dataListStats[i+1]);
@@ -258,8 +271,6 @@ void Game::setGreens()
     ui->rdy_2->setStyleSheet("background-color: green");
     ui->rdy_3->setStyleSheet("background-color: green");
     ui->rdy_4->setStyleSheet("background-color: green");
-    if (this->players < 4) ui->rdy_4->hide();
-    if (this->players < 3) ui->rdy_3->hide();
 }
 
 QString* Game::openMap()
@@ -323,7 +334,7 @@ void Game::paintEvent(QPaintEvent *)
         int x = this->dataListPowerups[i].toInt();
         int y = this->dataListPowerups[i+1].toInt();
         int color = this->dataListPowerups[i+2].toInt();
-        if (color == 1) pen.setColor(Qt::green);
+        if (color == 1) pen.setColor(Qt::green);        // range
         if (color == 2) pen.setColor(Qt::gray);
         if (color == 3) pen.setColor(Qt::blue);
         if (color == 4) pen.setColor(Qt::red);

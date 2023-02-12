@@ -40,7 +40,7 @@
          <x>11</x>
          <y>29</y>
          <width>151</width>
-         <height>81</height>
+         <height>90</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="p1" stretch="6,2">
@@ -65,14 +65,14 @@
           <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Speed</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Speed</string>
             </property>
            </widget>
           </item>
@@ -148,7 +148,7 @@
          <x>10</x>
          <y>29</y>
          <width>151</width>
-         <height>81</height>
+         <height>90</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="p1_2" stretch="6,2">
@@ -173,14 +173,14 @@
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Speed</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Speed</string>
             </property>
            </widget>
           </item>
@@ -256,7 +256,7 @@
          <x>10</x>
          <y>29</y>
          <width>151</width>
-         <height>81</height>
+         <height>90</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="p1_3" stretch="6,2">
@@ -281,14 +281,14 @@
           <item>
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Speed</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_10">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Speed</string>
             </property>
            </widget>
           </item>
@@ -392,14 +392,14 @@
           <item>
            <widget class="QLabel" name="label_13">
             <property name="text">
-             <string>Speed</string>
+             <string>Bomb strength</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_14">
             <property name="text">
-             <string>Bomb strength</string>
+             <string>Speed</string>
             </property>
            </widget>
           </item>
@@ -541,7 +541,7 @@
   </widget>
   <widget class="QTextEdit" name="console">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>

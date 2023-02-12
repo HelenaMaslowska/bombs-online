@@ -23,7 +23,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    void connectToServer();
+    void enableStartBtn();
 
 private slots:
     void on_startBtn_clicked();
@@ -39,10 +40,14 @@ private slots:
     void backToStart();
     //void keyPressed();
 
+    void on_confirmBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
     Game *game;
     QTcpSocket *TCPSocket;
+    QString address = "127.0.0.1";
+    int port = 8080;
     QTimer * timer;
     int status = 1;
 };

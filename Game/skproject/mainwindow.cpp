@@ -5,9 +5,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
     game = new Game();
-    TCPSocket = new QTcpSocket();
-    TCPSocket->connectToHost(QHostAddress::LocalHost, 8080);
-    connect(TCPSocket,SIGNAL(readyRead()),  this, SLOT(read_data_from_server()));
     connect(game, SIGNAL(readyYes()),       this, SLOT(rdyYes()));
     connect(game, SIGNAL(readyNo()),        this, SLOT(rdyNo()));
     connect(game, SIGNAL(keyboardUp()),     this, SLOT(up()));
@@ -16,13 +13,35 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(game, SIGNAL(keyboardRight()),  this, SLOT(right()));
     connect(game, SIGNAL(keyboardBomb()),   this, SLOT(bomb()));
     connect(game, SIGNAL(quitGameUI()),     this, SLOT(backToStart()));
-    TCPSocket->open(QIODevice::ReadWrite);
 //    if (TCPSocket->isOpen()) { QMessageBox::information(this, "Hej! Miłego kodowania!", "Połączyłaś się ez"); }
 }
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     if(TCPSocket) TCPSocket->close();
     delete ui;
 }
+
+void MainWindow::enableStartBtn()
+{
+    ui->startBtn->setEnabled(true);
+}
+
+void MainWindow::connectToServer()
+{
+    TCPSocket = new QTcpSocket();
+    TCPSocket->connectToHost(QHostAddress(this->address), this->port);
+    connect(TCPSocket,SIGNAL(readyRead()),  this, SLOT(read_data_from_server()));
+    TCPSocket->open(QIODevice::ReadWrite);
+    enableStartBtn();
+}
+
+void MainWindow::on_confirmBtn_clicked()
+{
+    this->address = ui->addressInput->text();
+    this->port = ui->portInput->text().toInt();
+    connectToServer();
+}
+
 void MainWindow::rdyYes()   { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;rdy;1;?"); }
 void MainWindow::rdyNo()    { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;rdy;0;?"); }
 void MainWindow::up()       { if (TCPSocket && TCPSocket->isOpen()) TCPSocket->write("!;go;u;?"); }
@@ -35,9 +54,7 @@ void MainWindow::backToStart()
 {
     this->ui->nickInput->setText("Nickname");
     TCPSocket->write("!;exit;?");
-    TCPSocket->close();
-    this->close();
-    //this->show();
+    this->show();
     //this->status = 1;
 }
 /*
@@ -47,13 +64,13 @@ void MainWindow::backToStart()
  */
 void MainWindow::on_startBtn_clicked() // send nickname to the server
 {
-    if(ui->nickInput->text() == "")
+    if (TCPSocket && TCPSocket->isOpen())
     {
-        QMessageBox::information(this, "So you are noname?", "Type your special nickname!");
-    }
-    else
-    {
-        if (TCPSocket && TCPSocket->isOpen())
+        if(ui->nickInput->text() == "")
+        {
+            QMessageBox::information(this, "So you are noname?", "Type your special nickname!");
+        }
+        else
         {
             QString prefix = "!;nick;";
             QString nick = ui->nickInput->text();
@@ -66,8 +83,7 @@ void MainWindow::on_startBtn_clicked() // send nickname to the server
             this->hide();
             this->status = 2;
         }
-        else { QMessageBox::information(this, "Hej! Miłego debugowania!", TCPSocket->errorString()); }
-    }
+    }else { QMessageBox::information(this, "Hej! Miłego debugowania!", TCPSocket->errorString()); }
 }
 
 /*
@@ -91,31 +107,25 @@ void MainWindow::read_data_from_server()
         {
             QByteArray data_from_server = TCPSocket->readAll();
             QString MessageString = QString::fromStdString(data_from_server.toStdString());
-            ui->nickInput->setText(MessageString);
+            //ui->nickInput->setText(MessageString);
             game->serverData(MessageString);
 
-            if(game->exit)
+            if(this->status == 3 && game->exit)
             {
-                TCPSocket->write("!;exit;?");
-                game->exit == false;
+                this->status = 1;
+                game->mapNumber = "0";
+                game->exit = false;
+
             }
 
-            if (this->status == 2)
+            if(MessageString == "!;allrdy;?")
             {
-                if(MessageString == "!;allrdy;?")
-                {
-                    this->status = 3;
-                    TCPSocket->write("!;go;s;?");
-                    game->disableReadyBtn();
-                    game->setGreens();
-                }
+                this->status = 3;
             }
             MessageString = "";
         }
     }
 }
-
-
 
 
 

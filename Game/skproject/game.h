@@ -71,8 +71,8 @@ public:
     QString nickname;
 
 public:
-    bool ready = 0;
-    bool exit = 0;
+    bool ready = false;
+    bool exit = false;
     //QString move = "";
     QString data;                   // string of input data
     QStringList dataList;           // splited 1 command

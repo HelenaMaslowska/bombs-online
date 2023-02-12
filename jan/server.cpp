@@ -66,6 +66,7 @@ struct Game{
 	vector<Bomb> bomby;
 	int ileGraczy=0;
 	int **plansza;
+	int who_won=-1;
 
 	void init(int k)
 	{
@@ -102,6 +103,18 @@ struct Game{
         	if(index<ileGraczy)
         	{
         		gracze.erase(gracze.begin()+index);
+        		ileGraczy-=1;
+        		for(int i=0;i<bomby.size();i++)
+        		{
+        			if(bomby[i].owner==index)
+        			{
+        				bomby[i].owner=-1;
+        			}
+        			if(bomby[i].owner>index)
+        			{
+        				bomby[i].owner-=1;
+        			}
+        		}
         	}
         }
 
@@ -141,7 +154,8 @@ struct Game{
 			gracze[i].hp-=1;
 			if(gracze[i].hp==0)
 			{
-				//TODO smierc
+				gracze[i].x=100;
+				gracze[i].y=100;
 			}
 			gracze[i].invulnerable=60;
 		}
@@ -167,6 +181,8 @@ struct Game{
 				modX-=1;
 				x+=1;
 			}
+			if(gracze[i].hp>0)
+			{
 			if(gracze[i].next_move=="l"){
 					if(plansza[x][y] ==0 || (plansza[x][y] >0 && modY <= 0)){
 					gracze[i].looking="l";
@@ -260,6 +276,7 @@ struct Game{
 							bomby.push_back(pom);
 						}
 					}
+			}
 			}
 			if(gracze[i].invulnerable>0)gracze[i].invulnerable-=1;
 			gracze[i].next_move="";
@@ -382,10 +399,35 @@ struct Game{
 			}else
 			{
 				plansza[bomby[i].x][bomby[i].y]=0;
-				gracze[bomby[i].owner].curBombs-=1;
+				if(bomby[i].owner!=-1) gracze[bomby[i].owner].curBombs-=1;
 				bomby.erase(bomby.begin()+i);
 				i-=1;
 			}
+		}
+		if(who_won==-1)
+		{
+			int alive_players=0;;
+			for(int i=0;i<ileGraczy;i++)
+			{
+				if(gracze[i].hp>0)
+				{
+					alive_players+=1;
+				}
+			}
+			if(alive_players<=1)
+			{
+				for(int i=0;i<ileGraczy;i++)
+				{
+					if(gracze[i].hp>0)
+					{
+						who_won=i;
+					}
+				}
+				if(who_won==-1)who_won=4;
+			}
+		}else
+		{
+			who_won=-2;
 		}
         	return 0;
 	}
@@ -754,23 +796,26 @@ void *client_inputs(void *arg)
                 			}else
                 			{
                 				int room_id=clients[i].room;
-                				int ready_id;
-                				for(int j=0;j<rooms[room_id].clients.size();j++)
+                				if(room_id!=-1)
                 				{
-                					if(rooms[room_id].clients[j]==i)
+                					int ready_id;
+                					for(int j=0;j<rooms[room_id].clients.size();j++)
                 					{
-                						ready_id=j;
-                						break;
+                						if(rooms[room_id].clients[j]==i)
+                						{
+                							ready_id=j;
+                							break;
+                						}
                 					}
-                				}
-                				try
-                				{
-                					int state = atoi(parsed_message[2].c_str());
-                					rooms[room_id].ready[ready_id]=state;
-                					send_room_info(clients[i].room);
-                				}catch(const exception& e)
-                				{
-                					cout<<"Ready state is not a number\n";
+                					try
+                					{
+                						int state = atoi(parsed_message[2].c_str());
+                						rooms[room_id].ready[ready_id]=state;
+                						send_room_info(clients[i].room);
+                					}catch(const exception& e)
+                					{
+                						cout<<"Ready state is not a number\n";
+                					}
                 				}
                 			}
                 		}
@@ -784,16 +829,19 @@ void *client_inputs(void *arg)
                 			}else
                 			{
                 				int room_id=clients[i].room;
-                				int player_id;
-                				for(int j=0;j<rooms[room_id].clients.size();j++)
+                				if(room_id!=-1)
                 				{
-                					if(rooms[room_id].clients[j]==i)
+                					int player_id;
+                					for(int j=0;j<rooms[room_id].clients.size();j++)
                 					{
-                						player_id=j;
-                						break;
+                						if(rooms[room_id].clients[j]==i)
+                						{
+                							player_id=j;
+                							break;
+                						}
                 					}
+                					rooms[room_id].game.player_input(player_id,parsed_message[2][0]);
                 				}
-                				rooms[room_id].game.player_input(player_id,parsed_message[2][0]);
 
                 			}
                 		}
@@ -807,22 +855,25 @@ void *client_inputs(void *arg)
                 			}else
                 			{
                 				int room_id=clients[i].room;
-                				int player_id;
-                				for(int j=0;j<rooms[room_id].clients.size();j++)
-                				{
-                					if(rooms[room_id].clients[j]==i)
+                				if(room_id!=-1){
+                					int player_id;
+                					for(int j=0;j<rooms[room_id].clients.size();j++)
                 					{
-                						rooms[room_id].clients.erase(rooms[room_id].clients.begin()+j);
-                						rooms[room_id].ready.erase(rooms[room_id].ready.begin()+j);
-                						if(rooms[room_id].all_ready==true)
+                						if(rooms[room_id].clients[j]==i)
                 						{
-                							rooms[room_id].game.remove_player(j);
+                							rooms[room_id].clients.erase(rooms[room_id].clients.begin()+j);
+                							rooms[room_id].ready.erase(rooms[room_id].ready.begin()+j);
+                							if(rooms[room_id].all_ready==true)
+                							{
+                								rooms[room_id].game.remove_player(j);
+                							}
+                							break;
                 						}
-                						break;
                 					}
+                					clients[i].room=-1;
+                					send_room_info(room_id);
                 				}
-                				clients[i].room=-1;
-                				send_room_info(room_id);
+                				
                 			}
                 		}
                 		if(!handled)
@@ -882,8 +933,24 @@ void *run_games(void *arg){
     					{
     						int sd=clients[rooms[i].clients[j]].sd;
     						send_message(sd,game_state);
+    						if(rooms[i].game.who_won==j)
+    						{
+    							send_message(sd,";win;");
+    						}else if(rooms[i].game.who_won>=0)
+    						{
+    							send_message(sd,";lose;");
+    						}
     					}
     					game_timers[i]=now;
+    					
+    				}
+    				if(rooms[i].clients.size()==0)
+    				{
+    					Game temp_game;
+    					rooms[i].game=temp_game;
+    					rooms[i].all_ready=false;
+    					rooms[i].map=(rand()%4);
+    					rooms[i].game.init(rooms[i].map);
     				}
     			}
     		}

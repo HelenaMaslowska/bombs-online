@@ -83,7 +83,7 @@ Game::~Game(){ delete ui; }
  */
 void Game::serverData(QString serverData)
 {
-    this->updateDataFromServer(serverData);     // NEED TO BE FIRST, SET DATA IN CLASS
+    this->updateDataFromServer(serverData);
     this->update();
 }
 
@@ -112,7 +112,6 @@ void Game::clearDataList()                  { this->dataList.clear(); }
 void Game::setDataSize()                    { this->dataSize = this->dataList.size(); }
 void Game::setDataList()
 {
-    //qDebug(this->data.toLatin1());
     QString message = this->data;
     QString temp_msg="";
     for(int j=0;j<message.length();j++)
@@ -135,9 +134,9 @@ void Game::setDataList()
 
 void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Powerups, s Stats
 {
-    int bricks, bombs, rangebombs, listStats, powerups, skip = 2;    //2 = game + !
+    int bricks, bombs, rangebombs, listStats, powerups, skip = 2;       //2 = game + !
     bricks = this->dataList[skip].toInt() * 2 + 1;                      // 3; 1;1; 1;1; 1;1 = 2*3+1 = 7  sum of these elements
-    bombs = this->dataList[skip+bricks].toInt() * 2 + 1;                // 4; 1;1; 1;1; 1;1; 1;1; = 2*4+1 = 9  sum of these elements
+    bombs = this->dataList[skip+bricks].toInt() * 2 + 1;
     rangebombs = this->dataList[skip+bricks+bombs].toInt() * 3 + 1;     // 1; 4;5;2; = 4 sum of these elements
     powerups = this->dataList[skip+bricks+bombs+rangebombs].toInt() * 3 + 1;
 
@@ -146,12 +145,10 @@ void Game::setDataSublists() //dataList: Bricks, Bombs, RangeBombs, Powerups, s 
     this->dataListRangeBombs = this->dataList.sliced(bricks+bombs+skip, rangebombs);
     this->dataListPowerups = this->dataList.sliced(bricks+bombs+rangebombs+skip, powerups);
 
-    listStats = skip + bricks + bombs + rangebombs + powerups + 1;              // example: 2 + 7 + 9 + 4 = 22 pos
+    listStats = skip + bricks + bombs + rangebombs + powerups + 1;
     int  players = this->dataList[skip+bricks+bombs+rangebombs+powerups].toInt();
     this->players = players;
-    this->dataListStats = this->dataList.sliced(listStats, this->playerDataSize*players); //1 is for skip the number of players
-
-    //ui->console->setText(this->dataListBricks.join(",") + "\n" + this->dataListBombs.join(","));
+    this->dataListStats = this->dataList.sliced(listStats, this->playerDataSize*players);
 }
 bool Game::legal()
 {
@@ -273,6 +270,12 @@ void Game::setGreens()
     ui->rdy_4->setStyleSheet("background-color: green");
 }
 
+void Game::setInformations()
+{
+    ui->console->setText("green -=- range \ngray -=- max bombs \nblue -=- speed \nred -=- HP \n yellow -=- immortality");
+}
+
+
 QString* Game::openMap()
 {
     if (legal() && this->dataList[1] == "map")
@@ -324,7 +327,8 @@ void Game::paintEvent(QPaintEvent *)
         float x = this->dataListStats[i].toFloat()/100;
         float y = this->dataListStats[i+1].toFloat()/100;
         painter.setBrush(Qt::SolidPattern);
-        pen.setColor(Qt::red);
+        if(this->dataListStats[i+7].toInt() == 1) pen.setColor(Qt::yellow);
+        else pen.setColor(Qt::red);
         painter.setPen(pen);
         painter.drawEllipse(QPointF(y*block_size+margin+block_size/2,x*block_size+margin+block_size/2), block_size*2/5, block_size*2/5);
     }
@@ -335,10 +339,10 @@ void Game::paintEvent(QPaintEvent *)
         int y = this->dataListPowerups[i+1].toInt();
         int color = this->dataListPowerups[i+2].toInt();
         if (color == 1) pen.setColor(Qt::green);        // range
-        if (color == 2) pen.setColor(Qt::gray);
-        if (color == 3) pen.setColor(Qt::blue);
-        if (color == 4) pen.setColor(Qt::red);
-        if (color == 5) pen.setColor(Qt::darkYellow);
+        if (color == 2) pen.setColor(Qt::gray);         // max bombs
+        if (color == 3) pen.setColor(Qt::blue);         // movement speed
+        if (color == 4) pen.setColor(Qt::red);          // hp
+        if (color == 5) pen.setColor(Qt::yellow);       // immortality
         painter.setBrush(Qt::DiagCrossPattern);
         painter.setPen(pen);
         painter.drawRect(QRect(y*block_size+margin+block_size/4, x*block_size+margin+block_size/4, block_size/2, block_size/2));
@@ -362,15 +366,7 @@ void Game::paintEvent(QPaintEvent *)
         }
     }
     pen.setColor(Qt::black);
-
 }
-
-//void Game::closeEvent(QCloseEvent *event)  // show prompt when user wants to close app {
-//    event->ignore();
-//    if (QMessageBox::Yes == QMessageBox::question(this, "Exit?", "You will lose if you exit!", QMessageBox::Yes | QMessageBox::No))
-//    { this->exit = true; event->accept(); }
-//    else { this->exit = false; } }
-
 
 void Game::keyPressEvent(QKeyEvent *event)
 {
@@ -407,9 +403,9 @@ void Game::on_exitBtn_clicked()
 }
 
 
-//QString* Game::openMap()        // też działa ale ma ścieżkę absolutną
+//QString* Game::openMap()        // works but with absolute paths
 //{
-//    QDir dir("../map" + this->mapNumber + ".txt"); //debug ma gdzie indziej więc nawet z QDir nie wyciągniesz ścieżki xd
+//    QDir dir("../map" + this->mapNumber + ".txt"); //debug is in another place, qDir wont get this path
 //    ui->console->setText(dir.currentPath());
 //    QFile file("/home/helena/Projekt/skproject/map" + this->mapNumber + ".txt");
 //    if(!file.exists())                  { qCritical() << "File not found";   }

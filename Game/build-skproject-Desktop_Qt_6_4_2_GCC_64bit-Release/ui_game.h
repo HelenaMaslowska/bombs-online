@@ -105,7 +105,7 @@ public:
         Player1->setObjectName("Player1");
         horizontalLayoutWidget = new QWidget(Player1);
         horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
-        horizontalLayoutWidget->setGeometry(QRect(11, 29, 151, 81));
+        horizontalLayoutWidget->setGeometry(QRect(11, 29, 151, 90));
         p1 = new QHBoxLayout(horizontalLayoutWidget);
         p1->setSpacing(2);
         p1->setObjectName("p1");
@@ -174,7 +174,7 @@ public:
         Player2->setObjectName("Player2");
         horizontalLayoutWidget_2 = new QWidget(Player2);
         horizontalLayoutWidget_2->setObjectName("horizontalLayoutWidget_2");
-        horizontalLayoutWidget_2->setGeometry(QRect(10, 29, 151, 81));
+        horizontalLayoutWidget_2->setGeometry(QRect(10, 29, 151, 90));
         p1_2 = new QHBoxLayout(horizontalLayoutWidget_2);
         p1_2->setSpacing(2);
         p1_2->setObjectName("p1_2");
@@ -243,7 +243,7 @@ public:
         Player3->setObjectName("Player3");
         horizontalLayoutWidget_3 = new QWidget(Player3);
         horizontalLayoutWidget_3->setObjectName("horizontalLayoutWidget_3");
-        horizontalLayoutWidget_3->setGeometry(QRect(10, 29, 151, 81));
+        horizontalLayoutWidget_3->setGeometry(QRect(10, 29, 151, 90));
         p1_3 = new QHBoxLayout(horizontalLayoutWidget_3);
         p1_3->setSpacing(2);
         p1_3->setObjectName("p1_3");
@@ -399,7 +399,7 @@ public:
         exitBtn->setGeometry(QRect(580, 510, 91, 31));
         console = new QTextEdit(Game);
         console->setObjectName("console");
-        console->setEnabled(false);
+        console->setEnabled(true);
         console->setGeometry(QRect(250, 510, 311, 101));
         console->setTextInteractionFlags(Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 
@@ -413,8 +413,8 @@ public:
         Game->setWindowTitle(QCoreApplication::translate("Game", "Bombs online!", nullptr));
         Player1->setTitle(QCoreApplication::translate("Game", "Player 1", nullptr));
         label_1->setText(QCoreApplication::translate("Game", "HP ", nullptr));
-        label_3->setText(QCoreApplication::translate("Game", "Speed", nullptr));
-        label_2->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_3->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_2->setText(QCoreApplication::translate("Game", "Speed", nullptr));
         label->setText(QCoreApplication::translate("Game", "Bombs", nullptr));
         HP_1->setText(QCoreApplication::translate("Game", "3", nullptr));
         Speed_1->setText(QCoreApplication::translate("Game", "0", nullptr));
@@ -423,8 +423,8 @@ public:
         rdy_1->setText(QString());
         Player2->setTitle(QCoreApplication::translate("Game", "Player 2", nullptr));
         label_4->setText(QCoreApplication::translate("Game", "HP ", nullptr));
-        label_5->setText(QCoreApplication::translate("Game", "Speed", nullptr));
-        label_6->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_5->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_6->setText(QCoreApplication::translate("Game", "Speed", nullptr));
         label_7->setText(QCoreApplication::translate("Game", "Bombs", nullptr));
         HP_2->setText(QCoreApplication::translate("Game", "3", nullptr));
         Speed_2->setText(QCoreApplication::translate("Game", "0", nullptr));
@@ -433,8 +433,8 @@ public:
         rdy_2->setText(QString());
         Player3->setTitle(QCoreApplication::translate("Game", "Player 3", nullptr));
         label_8->setText(QCoreApplication::translate("Game", "HP ", nullptr));
-        label_9->setText(QCoreApplication::translate("Game", "Speed", nullptr));
-        label_10->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_9->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_10->setText(QCoreApplication::translate("Game", "Speed", nullptr));
         label_11->setText(QCoreApplication::translate("Game", "Bombs", nullptr));
         HP_3->setText(QCoreApplication::translate("Game", "3", nullptr));
         Speed_3->setText(QCoreApplication::translate("Game", "0", nullptr));
@@ -443,8 +443,8 @@ public:
         rdy_3->setText(QString());
         Player4->setTitle(QCoreApplication::translate("Game", "Player 4", nullptr));
         label_12->setText(QCoreApplication::translate("Game", "HP ", nullptr));
-        label_13->setText(QCoreApplication::translate("Game", "Speed", nullptr));
-        label_14->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_13->setText(QCoreApplication::translate("Game", "Bomb strength", nullptr));
+        label_14->setText(QCoreApplication::translate("Game", "Speed", nullptr));
         label_15->setText(QCoreApplication::translate("Game", "Bombs", nullptr));
         HP_4->setText(QCoreApplication::translate("Game", "3", nullptr));
         Speed_4->setText(QCoreApplication::translate("Game", "0", nullptr));

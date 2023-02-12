@@ -72,6 +72,7 @@ void MainWindow::on_startBtn_clicked() // send nickname to the server
         }
         else
         {
+            game->setInformations();
             QString prefix = "!;nick;";
             QString nick = ui->nickInput->text();
             if(nick.size() > 15) nick = nick.sliced(0,15);

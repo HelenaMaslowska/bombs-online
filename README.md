@@ -11,8 +11,7 @@ Ok, there are some other rules...
 5. Use powerups to increase your survivability.
 6. Have fun!
 
-###
-Powerups
+### Powerups
 - green - range 
 - gray - max bombs 
 - blue - speed 

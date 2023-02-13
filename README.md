@@ -19,11 +19,11 @@ Ok, there are some other rules...
 - yellow - immortality
 
 ## Getting started
-If you need to compile server, use this command:
+If you need to compile server, use this command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/jan)!
 ```c++
 g++ server.cpp -o server -pthread
 ```
-Execute server using this command: ```./server <port_number>```. Example is shown below. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/jan)!
+Execute server using this command: ```./server <port_number>```. Example is shown below.
 ```c++
 ./server 8080
 ```

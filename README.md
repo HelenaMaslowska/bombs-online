@@ -1,7 +1,8 @@
 # Bombs Online
 Bombs online is 2D game made on Linux Ubuntu 18.04. Rules are simple:
 1. Be the last one to stand!
-Ok, there are more rules...
+
+Ok, there are some other rules...
 
 ## Rules
 2. Use ```w, a, s, d``` to move and ```x``` to place bombs.

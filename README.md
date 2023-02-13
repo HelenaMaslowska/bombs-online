@@ -29,7 +29,7 @@ Execute server using this command: ```./server <port_number>```. Example is show
 ./server 8080
 ```
 
-After that, you can open clients/gamers using following command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/Game/build-skproject-Desktop_Qt_6_4_2_GCC_64bit-Release)!
+After that, you can open clients/gamers using following command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/Game/build-skproject-Desktop_Qt_6_4_2_GCC_64bit-Release). You can have a lot of players playing in other rooms!
 ```c++
 ./skproject
 ```

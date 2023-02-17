@@ -1,5 +1,6 @@
 # Bombs Online
-Bombs online is 2D game made on Linux Ubuntu 18.04. Rules are simple:
+Bombs online is 2D game made on Linux Ubuntu in C++ and using Qt Creator 6. Game can be played if you have QT6 libraries installed in your device.
+Rules are simple:
 1. Be the last one to stand!
 
 Ok, there are some other rules...
@@ -19,7 +20,7 @@ Ok, there are some other rules...
 - yellow - immortality
 
 ## Getting started
-If you need to compile server, use this command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/Server)!
+You need to compile server on your computer, use this command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/Server)!
 ```c++
 g++ server.cpp -o server -pthread
 ```

@@ -1,5 +1,5 @@
 # Bombs Online
-Bombs online is 2D game made on Linux Ubuntu in C++ and using Qt Creator 6. Game can be played if you have QT6 libraries installed in your device.
+Bombs online is 2D game made on Linux Ubuntu in C++ and using Qt Creator 6. Game can be played if you have <ins>**QT6 libraries**</ins> installed in your device.
 Rules are simple:
 1. Be the last one to stand!
 

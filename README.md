@@ -19,7 +19,7 @@ Ok, there are some other rules...
 - yellow - immortality
 
 ## Getting started
-If you need to compile server, use this command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/jan)!
+If you need to compile server, use this command. Use this folder [path](https://github.com/HelenaMaslowska/bombs-online/tree/main/Server)!
 ```c++
 g++ server.cpp -o server -pthread
 ```

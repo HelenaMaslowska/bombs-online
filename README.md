@@ -1,5 +1,7 @@
 # Bombs Online
-Bombs online is 2D game made on Linux Ubuntu in C++ and using Qt Creator 6. Game can be played if you have <ins>**QT6 libraries**</ins> installed in your device.
+Bombs Online is a 2D game developed on Linux Ubuntu using C++ and Qt Creator 6. This educational Bomberman-style game operates on a client-server model, utilizing the TCP/IP protocol and sockets. You can play the game on two or more computers within the same network. Simply provide the server\'s IP address and the port on which the game should run. After entering both values, click "Set up," set your nickname, and click "Start." When all players in the room declare that they are ready to play, the game begins.
+
+If there are more than 4 players, multiple rooms will be created to accommodate everyone. In the game, you can move your character using the WASD keys and place bombs using the X key. At the start of the game, you have 3 hit points (HP), 1 explosion range, 1 speed, and more, but you can change these values through power-ups. You\'ll find power-ups where crates exploded. Below, there is a description of what each color of crate does. The game ends when there is only one player left alive. The game\'s source code is available on my GitHub.
 Rules are simple:
 1. Be the last one to stand!
 
